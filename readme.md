@@ -10,12 +10,20 @@
 
 | Приложение | Адрес | Исходник |
 |---|---|---|
-| Beauty Stuff для Android | [/beauty-stuff/](https://basilkot.github.io/ficus-policy/beauty-stuff/) | [`beauty-stuff/app/src/main/assets/policy.html`](https://github.com/basilkot/beauty-stuff/blob/main/app/src/main/assets/policy.html) |
+| Beauty Stuff для Android | [/beauty-stuff/](https://basilkot.github.io/ficus-policy/beauty-stuff/) | [`beauty-stuff/app/src/main/assets/policy-en.html`](https://github.com/basilkot/beauty-stuff/blob/main/app/src/main/assets/policy-en.html) |
+| Beauty Stuff для Android, по-русски | [/beauty-stuff/ru/](https://basilkot.github.io/ficus-policy/beauty-stuff/ru/) | [`beauty-stuff/app/src/main/assets/policy-ru.html`](https://github.com/basilkot/beauty-stuff/blob/main/app/src/main/assets/policy-ru.html) |
 | Beauty Stuff для iPhone | [/beauty-stuff-ios/](https://basilkot.github.io/ficus-policy/beauty-stuff-ios/) | [`beauty-stuff-ios/docs/privacy/index.html`](https://github.com/basilkot/beauty-stuff-ios/blob/main/docs/privacy/index.html) |
 | Beauty Stuff для iPhone — поддержка | [/beauty-stuff-ios/support/](https://basilkot.github.io/ficus-policy/beauty-stuff-ios/support/) | [`beauty-stuff-ios/docs/support/index.html`](https://github.com/basilkot/beauty-stuff-ios/blob/main/docs/support/index.html) |
 
 **Документа два, и это не дубль.** Приложения собирают данные по-разному, а политика
 описывает состав собираемого — общий документ был бы неверен для обеих версий.
+
+**Английская версия лежит в корне раздела, русская — в `ru/`.** Так же, как в самом
+приложении: с версии 1.2 базовый язык у него английский, и `/beauty-stuff/` — это то, что
+видит каждый, чьего языка у политики нет. Русская карточка в Play должна ссылаться прямо
+на `/beauty-stuff/ru/`; остальные — на `/beauty-stuff/`. Раньше по адресу `/beauty-stuff/`
+лежал русский текст, так что **ссылку в русской карточке нужно поменять** — иначе русский
+пользователь после этой правки попадёт на английскую страницу.
 
 ## Как обновлять
 
@@ -24,7 +32,8 @@
 правим сначала в репозитории приложения, а сюда копируем без изменений:
 
 ```sh
-cp ../beauty-stuff/app/src/main/assets/policy.html beauty-stuff/index.html
+cp ../beauty-stuff/app/src/main/assets/policy-en.html beauty-stuff/index.html
+cp ../beauty-stuff/app/src/main/assets/policy-ru.html beauty-stuff/ru/index.html
 cp ../beauty-stuff-ios/docs/privacy/index.html beauty-stuff-ios/index.html
 cp ../beauty-stuff-ios/docs/support/index.html beauty-stuff-ios/support/index.html
 ```
@@ -32,7 +41,8 @@ cp ../beauty-stuff-ios/docs/support/index.html beauty-stuff-ios/support/index.ht
 и проверяем, что копии совпали:
 
 ```sh
-diff beauty-stuff/index.html ../beauty-stuff/app/src/main/assets/policy.html
+diff beauty-stuff/index.html ../beauty-stuff/app/src/main/assets/policy-en.html
+diff beauty-stuff/ru/index.html ../beauty-stuff/app/src/main/assets/policy-ru.html
 diff beauty-stuff-ios/index.html ../beauty-stuff-ios/docs/privacy/index.html
 diff beauty-stuff-ios/support/index.html ../beauty-stuff-ios/docs/support/index.html
 ```

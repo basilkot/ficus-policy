@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Beauty Stuff для iPhone — политика конфиденциальности</title>
+<title>Beauty Stuff for iPhone — Privacy Policy</title>
 <style>
         :root {
             --primary: #009688;
@@ -71,111 +71,115 @@
 </head>
 <body>
 
-<!-- Источник правды — репозиторий basilkot/beauty-stuff-ios, файл docs/privacy/index.html.
-     Опубликованная копия живёт по адресу
-     https://basilkot.github.io/ficus-policy/beauty-stuff-ios/ — этот адрес идёт в карточку
-     App Store. После правки скопировать файл туда без изменений.
-     У Android-версии своя страница: данные там собираются иначе. -->
+<!-- Source of truth: the basilkot/beauty-stuff-ios repository, docs/privacy/index.html.
+     The published copy lives at
+     https://basilkot.github.io/ficus-policy/beauty-stuff-ios/ — that address goes into
+     the App Store listing for every locale except Russian. Copy the file there
+     unchanged after editing.
+     The Russian version lives at /ru/. Any change to the set of collected data goes
+     into both. The Android app has its own pages: it collects data differently. -->
 
-<h1>Beauty Stuff для iPhone — политика конфиденциальности</h1>
-<p class="date">Действует с 14 августа 2026 года</p>
+<h1>Beauty Stuff for iPhone — Privacy Policy</h1>
+<p class="updated">In effect since 14 August 2026 · <a href="ru/">Русская версия</a></p>
 
-<div class="card">
-  <p><strong>Если коротко:</strong></p>
+<div class="summary">
+  <p><strong>In short:</strong></p>
   <ul>
-    <li>всё, что вы заносите в косметичку, — продукты, даты, фотографии, список покупок — хранится
-      только на вашем устройстве;</li>
-    <li>наружу уходят отчёты о сбоях и обезличенная статистика использования — этим занимаются
-      службы Google, описанные ниже;</li>
-    <li>резервная копия создаётся только по вашей команде и в тот файл, который выбираете вы;</li>
-    <li>регистрация не нужна, рекламы нет, рекламный идентификатор не собирается, данные никому
-      не продаются.</li>
+    <li>everything you put into the app — products, dates, photos, shopping list — is kept
+      on your device only;</li>
+    <li>what leaves the device is crash reports and anonymous usage statistics, handled by
+      the Google services described below;</li>
+    <li>a backup is created only when you ask for it, into the file you choose;</li>
+    <li>no account is needed, there are no ads, the advertising identifier is not collected,
+      and the data is not sold to anyone.</li>
   </ul>
 </div>
 
-<h2>Кто отвечает за данные</h2>
-<p>Приложение Beauty Stuff разрабатывается и поддерживается частным лицом. Вопросы о данных,
-просьбы об удалении и всё остальное — на почту
+<h2>Who is responsible for the data</h2>
+<p>Beauty Stuff is developed and maintained by a private individual. Questions about data,
+deletion requests and anything else go to
 <a href="mailto:basilkot@gmail.com">basilkot@gmail.com</a>.</p>
 
-<h2>Что хранится на устройстве</h2>
-<p>Всё содержимое косметички остаётся в памяти телефона и никуда не отправляется:</p>
+<h2>What is kept on the device</h2>
+<p>Everything the app holds stays in the phone memory and is never sent anywhere:</p>
 <ul>
-  <li>продукты — название, бренд, категория, комментарий, даты покупки, вскрытия и срока годности;</li>
-  <li>фотографии продуктов;</li>
-  <li>справочники брендов и категорий;</li>
-  <li>список покупок;</li>
-  <li>настройки приложения — например, включены ли напоминания и на какое время.</li>
+  <li>products — name, brand, category, note, the dates of purchase, opening and expiration;</li>
+  <li>product photos;</li>
+  <li>the lists of brands and categories;</li>
+  <li>the shopping list;</li>
+  <li>app settings — whether reminders are on, and at what time, for example.</li>
 </ul>
-<p>Записи лежат в базе данных приложения, снимки — в его собственном каталоге. Ни то, ни другое
-не доступно другим приложениям. При удалении Beauty Stuff всё это стирается вместе с ним.</p>
+<p>The records live in the app database, the photos in its own directory. Neither is available
+to other apps. The home screen widget reads the same database and never leaves the device.
+Uninstalling Beauty Stuff erases all of it along with the app.</p>
 
-<h2>Что передаётся наружу</h2>
-<p>Приложение использует две службы компании Google LLC. Обе получают данные автоматически,
-отдельных действий от вас это не требует.</p>
+<h2>What leaves the device</h2>
+<p>The app uses two services from Google LLC. Both receive data automatically; nothing
+is required from you.</p>
 
-<h3>Отчёты о сбоях — Firebase Crashlytics</h3>
-<p>Когда приложение падает или спотыкается об ошибку, отправляется технический отчёт:</p>
+<h3>Crash reports — Firebase Crashlytics</h3>
+<p>When the app crashes or trips over an error, a technical report is sent:</p>
 <ul>
-  <li>тип ошибки и стек вызовов;</li>
-  <li>модель устройства, версия iOS, объём свободной памяти;</li>
-  <li>версия приложения и служебный идентификатор установки.</li>
+  <li>the error type and the call stack;</li>
+  <li>device model, iOS version, amount of free memory;</li>
+  <li>app version and a technical installation identifier.</li>
 </ul>
-<p>Содержимое косметички, фотографии и названия продуктов в отчёт не попадают.</p>
+<p>The contents of your collection, the photos and the product names never end up in a report.</p>
 
-<h3>Статистика использования — Google Analytics for Firebase</h3>
-<p>Собираются обезличенные сведения о том, как приложением пользуются: запуски и продолжительность
-сеансов, открытые экраны, а также несколько событий — что продукт заведён, отправлен в архив,
-что сделана или восстановлена резервная копия, что включены напоминания. Названия продуктов,
-брендов и фотографии в статистику не попадают.</p>
-<p>Приложение <strong>не собирает рекламный идентификатор устройства (IDFA)</strong> и не отслеживает
-вас в других приложениях и на сайтах. Поэтому системный запрос на отслеживание не показывается.</p>
-<p>Как Google обращается с полученными данными, описано в
-<a href="https://policies.google.com/privacy">политике конфиденциальности Google</a> и в
-<a href="https://firebase.google.com/terms/data-processing-terms">условиях Firebase</a>.</p>
+<h3>Usage statistics — Google Analytics for Firebase</h3>
+<p>Anonymous information on how the app is used is collected: launches and session length,
+the screens opened, and a handful of events — a product added, a product archived, a backup
+saved or restored, reminders switched on. Product names, brand names and photos never end up
+in the statistics.</p>
+<p>The app <strong>does not collect the device advertising identifier (IDFA)</strong> and does
+not track you across other apps and websites. That is why the system tracking prompt is never
+shown.</p>
+<p>How Google handles the data it receives is described in the
+<a href="https://policies.google.com/privacy">Google Privacy Policy</a> and in the
+<a href="https://firebase.google.com/terms/data-processing-terms">Firebase terms</a>.</p>
 
-<h2>Резервные копии</h2>
+<h2>Backups</h2>
 
-<h3>Копия, которую делаете вы</h3>
-<p>По команде «Сохранить копию» приложение собирает один файл с продуктами, справочниками,
-списком покупок и фотографиями и передаёт его системному диалогу «Поделиться». Куда положить
-файл — в «Файлы», в iCloud Drive, отправить себе почтой — выбираете вы. Приложение не отправляет
-копию никуда само и не имеет доступа к другим вашим файлам.</p>
+<h3>The backup you make</h3>
+<p>On “Save a backup” the app builds a single file with the products, the lists, the shopping
+list and the photos, and hands it to the system share dialog. Where the file goes — to Files,
+to iCloud Drive, to an email to yourself — is your choice. The app never sends the backup
+anywhere by itself and has no access to your other files.</p>
 
-<h3>Копия, которую делает iOS</h3>
-<p>Если на устройстве включена резервная копия iCloud или вы делаете копию на компьютер,
-операционная система сама сохраняет данные приложения вместе с фотографиями продуктов.
-Этим занимается iOS, а не приложение: доступа к содержимому копии у Beauty Stuff нет.
-Отключить можно в настройках устройства, раздел «iCloud → Резервная копия».</p>
+<h3>The backup iOS makes</h3>
+<p>If iCloud Backup is enabled on the device, or you back the device up to a computer, the
+operating system saves the app data along with the product photos on its own. This is done
+by iOS, not by the app: Beauty Stuff has no access to the contents of that backup. It can be
+turned off in the device settings, under “iCloud → iCloud Backup”.</p>
 
-<h2>Разрешения и зачем они</h2>
+<h2>Permissions and what they are for</h2>
 <ul>
-  <li><strong>Уведомления</strong> — чтобы напоминать об истекающих сроках годности. Разрешение
-    спрашивается только когда вы сами включаете напоминания в настройках приложения. Если
-    отказать, приложение продолжит работать, но напоминания приходить не будут.</li>
-  <li><strong>Камера</strong> — чтобы сфотографировать продукт для карточки. Спрашивается в момент
-    первого снимка. Без него можно выбрать готовое фото.</li>
+  <li><strong>Notifications</strong> — to remind you that a product is about to expire.
+    The permission is asked only when you switch reminders on yourself in the app settings.
+    If you decline, the app keeps working, but no reminders will arrive.</li>
+  <li><strong>Camera</strong> — to take a photo of a product for its page. Asked the first time
+    you take one. Without it you can still pick a photo you already have.</li>
 </ul>
-<p>Отдельного разрешения на доступ к медиатеке приложение не запрашивает: фотография выбирается
-системным диалогом, который передаёт только выбранное изображение. Ко всем остальным снимкам
-на устройстве у Beauty Stuff доступа нет.</p>
+<p>The app never asks for access to your photo library: a photo is picked in a system dialog
+that hands over the selected image and nothing else. Beauty Stuff has no access to any other
+photo on the device.</p>
 
-<h2>Дети</h2>
-<p>Приложение не адресовано детям младше 13 лет и не собирает их данные намеренно.</p>
+<h2>Children</h2>
+<p>The app is not directed at children under 13 and does not knowingly collect their data.</p>
 
-<h2>Ваши права</h2>
+<h2>Your rights</h2>
 <ul>
-  <li>Данные на устройстве вы контролируете сами: любую запись можно изменить или удалить
-    в приложении, а удаление приложения стирает всё разом.</li>
-  <li>Забрать свои данные можно в любой момент — командой «Сохранить копию» в настройках.</li>
-  <li>Чтобы попросить удалить отчёты о сбоях и статистику, связанные с вашей установкой, напишите
-    на <a href="mailto:basilkot@gmail.com">basilkot@gmail.com</a>.</li>
+  <li>The data on the device is yours to control: any record can be edited or deleted in the app,
+    and deleting the app erases everything at once.</li>
+  <li>You can take your data with you at any moment — “Save a backup” in the settings.</li>
+  <li>To ask for the crash reports and statistics tied to your installation to be deleted, write
+    to <a href="mailto:basilkot@gmail.com">basilkot@gmail.com</a>.</li>
 </ul>
 
-<h2>Изменения политики</h2>
-<p>Если состав собираемых данных изменится, этот текст будет обновлён вместе с приложением,
-а дата в начале документа — изменена. Продолжая пользоваться приложением после обновления,
-вы соглашаетесь с новой редакцией.</p>
+<h2>Changes to this policy</h2>
+<p>If the set of collected data changes, this text will be updated along with the app, and the
+date at the top of the document will change with it. By continuing to use the app after an
+update you accept the new version.</p>
 
 <footer>Beauty Stuff · <a href="mailto:basilkot@gmail.com">basilkot@gmail.com</a></footer>
 

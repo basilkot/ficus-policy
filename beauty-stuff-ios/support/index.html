@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Beauty Stuff для iPhone — поддержка</title>
+<title>Beauty Stuff for iPhone — Support</title>
 <style>
         :root {
             --primary: #009688;
@@ -64,84 +64,101 @@
 </head>
 <body>
 
-<!-- Источник правды — репозиторий basilkot/beauty-stuff-ios, файл docs/support/index.html.
-     Опубликованная копия живёт по адресу
-     https://basilkot.github.io/ficus-policy/beauty-stuff-ios/support/ — этот адрес идёт
-     в поле Support URL карточки App Store. После правки скопировать файл туда
-     без изменений. -->
+<!-- Source of truth: the basilkot/beauty-stuff-ios repository, docs/support/index.html.
+     The published copy lives at
+     https://basilkot.github.io/ficus-policy/beauty-stuff-ios/support/ — that address goes
+     into the Support URL field of the App Store listing for every locale except Russian.
+     Copy the file there unchanged after editing.
+     The Russian version lives at /ru/. -->
 
 <main>
 
-<h1>Beauty Stuff для iPhone — поддержка</h1>
-<p class="updated">Обновлено 15 августа 2026 года</p>
+<h1>Beauty Stuff for iPhone — Support</h1>
+<p class="updated">Updated 19 August 2026 · <a href="ru/">Русская версия</a></p>
 
-<p>Приложение помнит, что у вас в косметичке и когда это пора выбросить. Ниже — ответы
-на то, о чём спрашивают чаще всего. Если вашего случая здесь нет, напишите: я отвечаю сам.</p>
+<p>The app remembers what is in your collection and when it is time to throw it out. Below are
+the answers to what people ask most often. If your case is not here, write to me — I answer
+these myself.</p>
 
 <div class="contact">
-    <p>Почта для вопросов и сообщений об ошибках</p>
+    <p>Email for questions and bug reports</p>
     <p><a href="mailto:basilkot@gmail.com">basilkot@gmail.com</a></p>
 </div>
 
-<h2>Как приложение считает срок</h2>
+<h2>How the app works out the date</h2>
 
-<p>Дат может быть две, и приложение берёт ту, что наступит раньше:</p>
+<p>There can be two dates, and the app takes whichever comes first:</p>
 <ul>
-    <li><strong>«Годен до»</strong> — дата с упаковки, рядом с надписью EXP;</li>
-    <li><strong>«Срок жизни»</strong> — сколько месяцев продукт годен после вскрытия
-        (на упаковке это значок открытой баночки с числом и буквами PAO). Он считается
-        от даты, которую вы указали в поле «Начало использования».</li>
+    <li><strong>“Best before”</strong> — the date printed on the package, next to EXP;</li>
+    <li><strong>“Period after opening”</strong> — how many months the product keeps once opened
+        (on the package it is the open jar symbol with a number and the letters PAO). It is
+        counted from the date you put in “Opened on”.</li>
 </ul>
 
-<p>Если не задано ни то, ни другое, срок остаётся неизвестным — продукт хранится в списке,
-но в «Требуют внимания» не попадает и напоминаний по нему не будет.</p>
+<p>If neither is set, the date stays unknown: the product is kept in the list, but it never
+shows up in “Needs attention” and no reminders are sent for it.</p>
 
-<h2>Не приходят напоминания</h2>
+<h2>Reminders do not arrive</h2>
 
-<p>Проверьте по порядку:</p>
+<p>Check, in this order:</p>
 <ul>
-    <li>в настройках приложения включён переключатель «Напоминания»;</li>
-    <li>в системных «Настройках → Уведомления → Beauty Stuff» разрешение выдано.
-        Если однажды вы отказали, приложение больше не может спросить — только вы
-        в системных настройках;</li>
-    <li>у продукта задан срок: без срока напоминать не о чем;</li>
-    <li>время и запас заданы в разделе «Сроки»: за день, неделю, две недели или месяц.</li>
+    <li>the “Reminders” switch is on in the app settings;</li>
+    <li>permission is granted in Settings → Notifications → Beauty Stuff. If you declined once,
+        the app can no longer ask — only you can change it in the system settings;</li>
+    <li>the product has a date: without one there is nothing to remind about;</li>
+    <li>the time and the notice period are set in the “Dates” section: a day, a week, two weeks
+        or a month ahead.</li>
 </ul>
 
-<h2>Как перенести косметичку на другой айфон</h2>
+<h2>The home screen widget</h2>
 
-<p>Проще всего — штатной резервной копией iOS: приложение в неё попадает целиком,
-вместе с фотографиями, и на новом телефоне всё оказывается на месте само.</p>
+<p>The “Needs attention” widget shows the same thing as the top section of the list: products
+whose time is running out or has already run out. It comes in three sizes, from a single line
+to seven. Tapping a line opens that product’s page.</p>
 
-<p>Если нужен отдельный файл, в настройках есть «Сохранить копию»: в неё войдут продукты,
-справочники, список покупок и фотографии. Файл можно положить куда угодно — в «Файлы»,
-в облако, отправить себе. На другом устройстве — «Восстановить из копии» и выбрать этот файл.</p>
+<p>It is added like any other widget: touch and hold an empty spot on the home screen, tap “+”
+in the top left corner, and search for the app by name.</p>
 
-<p>Восстановление <strong>заменяет</strong> всё, что сейчас в приложении, а не дополняет.</p>
+<p>If the widget is empty while something in the app is about to expire, check the notice period
+in the “Dates” section: the widget picks products by the same setting as the “Needs attention”
+section. The widget refreshes when you leave the app, and once a day on its own.</p>
 
-<h2>Удалила продукт по ошибке</h2>
+<h2>Moving your collection to another iPhone</h2>
 
-<p>Сразу после удаления внизу экрана появляется подсказка с кнопкой «Отменить» — она
-возвращает продукт вместе с фотографией. Если подсказка уже исчезла, вернуть запись нельзя.</p>
+<p>The simplest way is the standard iOS backup: the app goes into it whole, photos included,
+and everything is in place on the new phone by itself.</p>
 
-<p>Поэтому для того, чем вы больше не пользуетесь, есть архив: продукт уходит с глаз,
-но остаётся в приложении, и его всегда можно достать обратно.</p>
+<p>If you need a separate file, the settings have “Save a backup”: it holds the products, the
+lists of brands and categories, the shopping list and the photos. Put the file wherever you
+like — Files, a cloud, an email to yourself. On the other device use “Restore from a backup”
+and pick that file.</p>
 
-<h2>Где хранятся мои данные</h2>
+<p>Restoring <strong>replaces</strong> everything currently in the app rather than adding to it.</p>
 
-<p>Косметичка, фотографии и списки лежат только на вашем устройстве. Ни регистрации,
-ни подписки, ни рекламы нет. Что именно уходит наружу — отчёты о сбоях и обезличенная
-статистика — описано в <a href="../">политике конфиденциальности</a>.</p>
+<h2>I deleted a product by mistake</h2>
 
-<h2>Нашли ошибку</h2>
+<p>Right after the deletion a prompt with an “Undo” button appears at the bottom of the screen —
+it brings the product back together with its photo. Once the prompt is gone, the record cannot
+be recovered.</p>
 
-<p>Напишите на <a href="mailto:basilkot@gmail.com">basilkot@gmail.com</a>. Помогает,
-если в письме будут: версия приложения (она внизу экрана настроек), модель телефона
-и версия iOS, а также что вы делали перед тем, как всё пошло не так. Снимок экрана —
-почти всегда лучшее, что можно приложить.</p>
+<p>That is what the archive is for: a product you no longer use goes out of sight but stays
+in the app, and you can always take it back out.</p>
+
+<h2>Where my data is kept</h2>
+
+<p>Your collection, the photos and the lists live on your device only. There is no account,
+no subscription and no advertising. What does leave the device — crash reports and anonymous
+usage statistics — is described in the <a href="../">privacy policy</a>.</p>
+
+<h2>You found a bug</h2>
+
+<p>Write to <a href="mailto:basilkot@gmail.com">basilkot@gmail.com</a>. It helps if the email
+has the app version (it is at the bottom of the settings screen), the phone model and the iOS
+version, and what you were doing right before things went wrong. A screenshot is almost always
+the best thing to attach.</p>
 
 <footer>
-    Beauty Stuff — приложение для учёта косметики и сроков её годности.
+    Beauty Stuff — an app for keeping track of cosmetics and their expiry dates.
 </footer>
 
 </main>

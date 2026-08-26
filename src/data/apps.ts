@@ -20,11 +20,15 @@ export interface AppEntry {
 }
 
 /**
- * Токен провайдера в App Store Connect.
+ * Токен провайдера в App Store Connect — число, опознающее аккаунт разработчика.
  *
- * Без него метка кампании (`ct`) уходит в пустоту: Apple принимает параметр, но в отчётах
- * не показывает — разбивка по кампаниям существует только в паре `pt` + `ct`. Пока токена
- * нет, ссылка остаётся рабочей, а вот измерять по ней нечего.
+ * Один на все приложения и все кампании: меняется только `ct`. Отдельно он нигде
+ * не выдаётся, а создаётся сам при первой кампании в Analytics → Acquisition → Campaigns,
+ * и берётся из готовой ссылки.
+ *
+ * Без него метка кампании уходит в пустоту: Apple параметр примет, но в отчётах не покажет
+ * — разбивка существует только в паре `pt` + `ct`. Пока токена нет, ссылка остаётся
+ * рабочей, а вот измерять по ней нечего.
  */
 export const appleProviderToken: string | null = null
 
@@ -56,13 +60,24 @@ export function appBySlug(slug: string): AppEntry {
  * Без названия в пути (`/app/idNNN`, а не `/app/beauty-stuff/idNNN`): название в адресе
  * Apple всё равно игнорирует, а переименование приложения оставило бы в коллажах
  * прошлых лет ссылку с прошлым именем.
+ *
+ * **С токеном адрес другой, и это не украшение.** У ссылок с кампанией Apple свой
+ * канонический вид — `/app/apple-store/idNNN` и `mt=8` в придачу к `pt` и `ct`, — и он
+ * единственный, про который известно, что кампания в отчётах доезжает. Без токена
+ * считать всё равно нечего, поэтому там остаётся короткий адрес: лишние части нужны
+ * ровно тогда, когда появляется, ради чего их терпеть.
  */
 export function appStoreURL(app: AppEntry, campaign: Campaign): string {
-  const url = new URL(`https://apps.apple.com/app/id${app.appStoreId}`)
-  if (appleProviderToken) {
-    url.searchParams.set('pt', appleProviderToken)
-    url.searchParams.set('ct', campaign)
+  if (!appleProviderToken) {
+    return `https://apps.apple.com/app/id${app.appStoreId}`
   }
+
+  const url = new URL(`https://apps.apple.com/app/apple-store/id${app.appStoreId}`)
+  url.searchParams.set('pt', appleProviderToken)
+  url.searchParams.set('ct', campaign)
+  // Тип содержимого — «программа». Параметр древний, но Apple приводит его в своём
+  // же образце ссылки, и спорить с образцом дороже, чем дописать четыре символа
+  url.searchParams.set('mt', '8')
   return url.toString()
 }
 

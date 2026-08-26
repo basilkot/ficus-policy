@@ -1,0 +1,163 @@
+---
+import QR from './QR.astro'
+import { appStoreURL, playStoreURL, type AppEntry, type Campaign } from '../data/apps'
+
+/**
+ * Страница перехода: то, куда ведёт короткий адрес с коллажа.
+ *
+ * **Она не лендинг и не витрина.** Человек попал сюда, уже увидев картинку и уже захотев
+ * приложение — ему остаётся один шаг, и любой экран между ним и стором этот шаг ломает.
+ * Поэтому с телефона страница не показывается вовсе: скрипт уводит в нужный стор раньше,
+ * чем успевает нарисоваться текст.
+ *
+ * Показать её есть кому и без телефона. Коллаж живёт в Pinterest и в переписке, которую
+ * открывают с компьютера, — и вот там выбирать стор за человека нельзя, потому что
+ * устройство, на которое ставить, у него в кармане, а не под рукой. Ему нужен QR.
+ */
+interface Props {
+  app: AppEntry
+  lang: 'en' | 'ru'
+}
+
+const { app, lang } = Astro.props
+
+const copy = {
+  en: {
+    open: 'Opening the store…',
+    manual: 'Nothing happened? Pick your store:',
+    scan: 'On a computer? Scan this with your phone.',
+    appStore: 'Download on the App Store',
+    play: 'Get it on Google Play',
+  },
+  ru: {
+    open: 'Открываем магазин…',
+    manual: 'Ничего не произошло? Выберите магазин:',
+    scan: 'Смотрите с компьютера? Наведите телефон.',
+    appStore: 'Загрузить в App Store',
+    play: 'Доступно в Google Play',
+  },
+}[lang]
+
+/**
+ * Ссылки на все метки сразу, а не на одну.
+ *
+ * Метка приходит в адресе (`?from=collage`), то есть известна только в браузере, — а сами
+ * ссылки собираются здесь, на сборке, вместе с токенами и `referrer`. Собирать их в браузере
+ * значило бы завести вторую копию тех же правил, которая однажды разойдётся с первой.
+ */
+const campaigns: Campaign[] = ['collage', 'year', 'site', 'qr']
+const links = Object.fromEntries(
+  campaigns.map((campaign) => [campaign, { ios: appStoreURL(app, campaign), android: playStoreURL(app, campaign) }]),
+)
+
+// QR ведёт не в стор, а сюда же: код снимают с чужого экрана, и какой телефон его снимет —
+// заранее не знает никто. Пусть решает та же страница, уже открытая на нужном устройстве
+const qrTarget = new URL(`/${app.slug}?from=qr`, Astro.site).toString()
+---
+
+<script is:inline define:vars={{ links, fallback: 'site' }}>
+  // В `head` и синхронно — чтобы уйти до первой отрисовки: мелькнувшая и исчезнувшая
+  // страница читается как сбой, даже когда всё сработало
+  ;(function () {
+    var params = new URLSearchParams(location.search)
+    // Чтобы страницу можно было открыть и посмотреть с телефона — иначе она недоступна
+    // тому единственному, кто её правит
+    if (params.has('stay')) return
+
+    var ua = navigator.userAgent
+    // iPad с iPadOS 13 представляется маком: отличает его только сенсорный ввод,
+    // которого у настоящего мака нет
+    var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    var isAndroid = /Android/.test(ua)
+    if (!isIOS && !isAndroid) return
+
+    var campaign = params.get('from')
+    var link = links[campaign] || links[fallback]
+    // `replace`, а не `href`: иначе кнопка «назад» возвращает на эту же страницу,
+    // которая тут же уводит обратно в стор, и выйти из неё нельзя
+    location.replace(isIOS ? link.ios : link.android)
+  })()
+</script>
+
+<main>
+  <img class="icon" src={app.icon} alt="" width="88" height="88" />
+  <h1>{app.name}</h1>
+  <p class="tagline">{app.tagline[lang]}</p>
+
+  <p class="note" data-role="opening">{copy.open}</p>
+
+  <p class="note">{copy.manual}</p>
+  <div class="stores">
+    <a class="store" href={links.site.ios}>{copy.appStore}</a>
+    <a class="store" href={links.site.android}>{copy.play}</a>
+  </div>
+
+  <div class="scan">
+    <QR value={qrTarget} />
+    <p class="note">{copy.scan}</p>
+  </div>
+</main>
+
+<script is:inline>
+  // «Открываем магазин…» показывается только тем, кого действительно уводят. На компьютере
+  // эта строка была бы обещанием, которое никто не собирается выполнять
+  document.querySelector('[data-role="opening"]').hidden = true
+</script>
+
+<style>
+  main {
+    text-align: center;
+  }
+
+  .icon {
+    border-radius: 20px;
+    box-shadow: 0 2px 12px rgb(0 0 0 / 12%);
+  }
+
+  h1 {
+    font-size: 28px;
+    margin: 20px 0 6px;
+  }
+
+  .tagline {
+    color: var(--muted);
+    margin: 0 0 36px;
+  }
+
+  .note {
+    color: var(--muted);
+    font-size: 15px;
+    margin: 0 0 12px;
+  }
+
+  .stores {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 44px;
+  }
+
+  .store {
+    display: block;
+    padding: 14px 18px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .store:hover {
+    border-color: var(--accent);
+  }
+
+  .scan {
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+
+  .scan .note {
+    margin: 14px 0 0;
+  }
+</style>

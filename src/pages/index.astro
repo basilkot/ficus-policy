@@ -1,0 +1,79 @@
+---
+import Page from '../layouts/Page.astro'
+import { apps } from '../data/apps'
+import { documents } from '../data/documents'
+
+// Корень — пока опись, а не витрина: приложение одно, и обещать страницей больше,
+// чем есть, значит разочаровать первым же экраном
+---
+
+<Page lang="en" title="Ficus Apps" description="Small apps for everyday things.">
+  <main>
+    <h1>Ficus Apps</h1>
+    <p class="lead">Small apps for everyday things.</p>
+
+    <ul>
+      {
+        apps.map((app) => (
+          <li>
+            <a href={`/${app.slug}?from=site`}>
+              <img src={app.icon} alt="" width="48" height="48" />
+              <span>
+                <strong>{app.name}</strong>
+                <em>{app.tagline.en}</em>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <h2>Documents</h2>
+    <p class="lead">
+      Privacy policies and support pages — the addresses the app store listings point at.
+    </p>
+
+    <ul class="documents">
+      {
+        documents.map((document) => (
+          <li>
+            <a href={document.href}>
+              <span>
+                <strong>{document.title}</strong>
+                <em>{document.note}</em>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
+</Page>
+
+<style>
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 20px; margin: 48px 0 4px; }
+  .lead { color: var(--muted); margin: 0 0 36px; }
+  h2 + .lead { font-size: 15px; margin-bottom: 20px; }
+  ul { list-style: none; padding: 0; margin: 0; }
+  li { border-top: 1px solid var(--line); }
+  li:last-child { border-bottom: 1px solid var(--line); }
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 0;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  img { border-radius: 11px; }
+
+  /* У документов значка нет: иконка приложения рядом с политикой обещала бы приложение,
+     а откроется текст */
+  .documents a { padding: 14px 0; }
+  .documents strong { font-weight: 600; font-size: 16px; }
+  strong { display: block; font-size: 17px; }
+  em { display: block; font-style: normal; color: var(--muted); font-size: 15px; }
+</style>

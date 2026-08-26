@@ -1,0 +1,97 @@
+---
+/**
+ * Общая обвязка страницы: шрифты, палитра, теги превью.
+ *
+ * Теги превью здесь не для порядка. Коллаж уходит в Pinterest и в мессенджеры, а туда
+ * попадает не страница, а её карточка — картинка с заголовком. Без `og:*` карточка
+ * собирается из чего попало, и пин, который должен вести в стор, выглядит как ошибка.
+ */
+interface Props {
+  title: string
+  description: string
+  lang: 'en' | 'ru'
+  /** Абсолютный адрес картинки превью — относительный Pinterest не примет. */
+  preview?: string
+  /** Куда ведёт «та же страница на другом языке». */
+  alternate?: { lang: string; href: string }[]
+}
+
+const { title, description, lang, preview, alternate = [] } = Astro.props
+const canonical = new URL(Astro.url.pathname, Astro.site)
+const previewURL = preview ? new URL(preview, Astro.site) : undefined
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {alternate.map((item) => <link rel="alternate" hreflang={item.lang} href={new URL(item.href, Astro.site)} />)}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {previewURL && <meta property="og:image" content={previewURL} />}
+    <meta name="twitter:card" content={previewURL ? 'summary_large_image' : 'summary'} />
+
+    <link rel="icon" href="/favicon.png" />
+
+    <style is:global>
+      /* Цвет один и тот же с приложением: #006A60 — его `primary` в Material-теме.
+         Сайт, покрашенный иначе, читался бы как чужой, а он ровно про узнавание */
+      :root {
+        --accent: #006a60;
+        --accent-dark: #004f47;
+        --text: #1a1c1b;
+        --muted: #5b6360;
+        --line: #dde3e1;
+        --bg: #fff;
+        --surface: #f4f7f6;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --accent: #74f8e5;
+          --accent-dark: #9ffbec;
+          --text: #e2e3e1;
+          --muted: #a5adaa;
+          --line: #2b3230;
+          --bg: #101413;
+          --surface: #1a201f;
+        }
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 17px;
+        line-height: 1.55;
+        -webkit-text-size-adjust: 100%;
+      }
+
+      main {
+        max-width: 34rem;
+        margin: 0 auto;
+        padding: 56px 20px 72px;
+      }
+
+      a { color: var(--accent-dark); }
+
+      @media (prefers-color-scheme: dark) {
+        a { color: var(--accent); }
+      }
+    </style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

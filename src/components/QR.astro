@@ -1,0 +1,41 @@
+---
+import QRCode from 'qrcode'
+
+/**
+ * QR-код, посчитанный на сборке, а не в браузере.
+ *
+ * Причина не в скорости: страница перехода должна работать в чужом вайфае гостиницы
+ * и в браузере, где скрипты вырублены. Посчитанный заранее код — это разметка,
+ * а не поведение, и он появляется одновременно со страницей.
+ */
+interface Props {
+  value: string
+  size?: number
+}
+
+const { value, size = 148 } = Astro.props
+
+// Чёрным по белому и в тёмной теме тоже. Инвертированный код часть сканеров не берёт,
+// а тёмная тема здесь — не та ценность, ради которой стоит рисковать съёмкой
+const svg = (await QRCode.toString(value, {
+  type: 'svg',
+  margin: 0,
+  errorCorrectionLevel: 'M',
+  color: { dark: '#000000', light: '#00000000' },
+}))
+  .replace(/<svg /, `<svg width="${size}" height="${size}" `)
+---
+
+<div class="qr">
+  <Fragment set:html={svg} />
+</div>
+
+<style>
+  .qr {
+    display: inline-flex;
+    padding: 12px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+  }
+</style>

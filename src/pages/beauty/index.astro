@@ -1,0 +1,21 @@
+---
+import Page from '../../layouts/Page.astro'
+import AppGate from '../../components/AppGate.astro'
+import { appBySlug } from '../../data/apps'
+
+const app = appBySlug('beauty')
+---
+
+<Page
+  lang="en"
+  title={`${app.name} — get the app`}
+  description={app.tagline.en}
+  preview="/beauty/icon.png"
+  alternate={[
+    { lang: 'en', href: '/beauty' },
+    { lang: 'ru', href: '/ru/beauty' },
+    { lang: 'x-default', href: '/beauty' },
+  ]}
+>
+  <AppGate app={app} lang="en" />
+</Page>

@@ -1,0 +1,57 @@
+# Публикация сайта на GitHub Pages.
+#
+# Через Actions, а не «публиковать из ветки»: вторая умеет отдавать только то, что лежит
+# в репозитории, — значит собранный `dist/` пришлось бы коммитить руками, и однажды
+# опубликованным оказался бы не тот сайт, который в исходниках. Здесь сборка идёт из
+# исходников при каждом пуше, и разойтись им негде.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  # Ручной запуск: пригодится, когда публикация сорвалась не по вине кода
+  workflow_dispatch:
+
+# Право писать в Pages выдаётся заданию, а не токену на весь репозиторий
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Публикации не наслаиваются: если пуш пришёл во время предыдущей, ждёт своей очереди,
+# а не отменяет её на середине — оборванный деплой оставляет сайт в неизвестном состоянии
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `ci`, а не `install`: ставит ровно то, что записано в `package-lock.json`,
+      # и падает при расхождении вместо того, чтобы молча обновить зависимость
+      - run: npm ci
+      - run: npm run build
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

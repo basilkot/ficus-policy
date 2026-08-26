@@ -30,7 +30,7 @@ export interface AppEntry {
  * — разбивка существует только в паре `pt` + `ct`. Пока токена нет, ссылка остаётся
  * рабочей, а вот измерять по ней нечего.
  */
-export const appleProviderToken: string | null = null
+export const appleProviderToken: string | null = '125907492'
 
 export const apps: AppEntry[] = [
   {

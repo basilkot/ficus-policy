@@ -1,6 +1,6 @@
 ---
 import QR from './QR.astro'
-import { appStoreURL, playStoreURL, type AppEntry, type Campaign } from '../data/apps'
+import { appStoreURL, playStoreURL, type AppEntry, type Campaign, type Source } from '../data/apps'
 
 /**
  * Страница перехода: то, куда ведёт короткий адрес с коллажа.
@@ -46,8 +46,19 @@ const copy = {
  * значило бы завести вторую копию тех же правил, которая однажды разойдётся с первой.
  */
 const campaigns: Campaign[] = ['collage', 'year', 'site', 'qr']
+const sources: (Source | undefined)[] = [undefined, 'ios', 'android']
+
+/**
+ * Ключ — метка и платформа отправителя вместе: `collage_android`. Он же уедет в отчёт,
+ * так что разложить его обратно можно глазами, без словаря соответствий.
+ */
 const links = Object.fromEntries(
-  campaigns.map((campaign) => [campaign, { ios: appStoreURL(app, campaign), android: playStoreURL(app, campaign) }]),
+  campaigns.flatMap((campaign) =>
+    sources.map((source) => [
+      source ? `${campaign}_${source}` : campaign,
+      { ios: appStoreURL(app, campaign, source), android: playStoreURL(app, campaign, source) },
+    ]),
+  ),
 )
 
 // QR ведёт не в стор, а сюда же: код снимают с чужого экрана, и какой телефон его снимет —
@@ -71,8 +82,12 @@ const qrTarget = new URL(`/${app.slug}?from=qr`, Astro.site).toString()
     var isAndroid = /Android/.test(ua)
     if (!isIOS && !isAndroid) return
 
+    // Платформа отправителя приезжает отдельным параметром и склеивается с меткой:
+    // приложение знает, что за картинка и откуда ушло, а как это назвать в отчёте —
+    // дело этой страницы
     var campaign = params.get('from')
-    var link = links[campaign] || links[fallback]
+    var via = params.get('via')
+    var link = links[campaign + '_' + via] || links[campaign] || links[fallback]
     // `replace`, а не `href`: иначе кнопка «назад» возвращает на эту же страницу,
     // которая тут же уводит обратно в стор, и выйти из неё нельзя
     location.replace(isIOS ? link.ios : link.android)

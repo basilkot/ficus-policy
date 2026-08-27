@@ -9,6 +9,16 @@
 /** Откуда человек пришёл. Ровно те метки, что подставляют приложения при отправке. */
 export type Campaign = 'collage' | 'year' | 'site' | 'qr'
 
+/**
+ * С какой платформы ушла картинка — не та, на которой её открыли.
+ *
+ * Для перехода это знать незачем: куда вести, страница решает по устройству того, кто
+ * смотрит. Нужно оно ради другого вопроса — кто распространяет. Установка в App Store
+ * по ссылке из Android-коллажа означает, что картинки ходят по компаниям с айфонами,
+ * а это меняет, куда вкладываться. Слитые в одну строку, обе платформы такого не покажут.
+ */
+export type Source = 'ios' | 'android'
+
 export interface AppEntry {
   /** Кусок адреса: `ficusapps.com/beauty`. Короткий, потому что его набирают руками с картинки. */
   slug: string
@@ -67,14 +77,14 @@ export function appBySlug(slug: string): AppEntry {
  * считать всё равно нечего, поэтому там остаётся короткий адрес: лишние части нужны
  * ровно тогда, когда появляется, ради чего их терпеть.
  */
-export function appStoreURL(app: AppEntry, campaign: Campaign): string {
+export function appStoreURL(app: AppEntry, campaign: Campaign, source?: Source): string {
   if (!appleProviderToken) {
     return `https://apps.apple.com/app/id${app.appStoreId}`
   }
 
   const url = new URL(`https://apps.apple.com/app/apple-store/id${app.appStoreId}`)
   url.searchParams.set('pt', appleProviderToken)
-  url.searchParams.set('ct', campaign)
+  url.searchParams.set('ct', label(campaign, source))
   // Тип содержимого — «программа». Параметр древний, но Apple приводит его в своём
   // же образце ссылки, и спорить с образцом дороже, чем дописать четыре символа
   url.searchParams.set('mt', '8')
@@ -87,9 +97,9 @@ export function appStoreURL(app: AppEntry, campaign: Campaign): string {
  * Метка кампании уезжает внутрь `referrer` целой строкой запроса — так её требует Play,
  * и поэтому она кодируется дважды: один раз здесь, второй раз при подстановке в адрес.
  */
-export function playStoreURL(app: AppEntry, campaign: Campaign): string {
+export function playStoreURL(app: AppEntry, campaign: Campaign, source?: Source): string {
   const referrer = new URLSearchParams({
-    utm_source: campaign,
+    utm_source: label(campaign, source),
     utm_medium: 'share',
     utm_campaign: 'ficusapps',
   }).toString()
@@ -98,4 +108,14 @@ export function playStoreURL(app: AppEntry, campaign: Campaign): string {
   url.searchParams.set('id', app.playPackage)
   url.searchParams.set('referrer', referrer)
   return url.toString()
+}
+
+/**
+ * Метка кампании: что за картинка и с какой платформы ушла.
+ *
+ * Одной строкой, а не двумя параметрами: и Apple, и Play принимают ровно одну метку,
+ * и разложить её обратно можно глазами — `collage_android` читается без инструкции.
+ */
+function label(campaign: Campaign, source?: Source): string {
+  return source ? `${campaign}_${source}` : campaign
 }

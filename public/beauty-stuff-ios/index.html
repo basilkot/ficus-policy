@@ -71,130 +71,206 @@
 </head>
 <body>
 
-<!-- Source of truth: the basilkot/beauty-stuff-ios repository, docs/privacy/index.html.
-     The published copy lives at
-     https://basilkot.github.io/ficus-policy/beauty-stuff-ios/ — that address goes into
-     the App Store listing for every locale except Russian. Copy the file there
-     unchanged after editing.
-     The Russian version lives at /ru/. Any change to the set of collected data goes
-     into both. The Android app has its own pages: it collects data differently. -->
+<!-- Source of truth: repository basilkot/beauty-stuff-ios, file docs/privacy/index.html.
+     The published copy lives at https://basilkot.github.io/ficus-policy/beauty-stuff-ios/
+     — that address goes into the App Store listing for every locale except Russian.
+     The Russian version sits in /ru/. Changes to what data is collected go into both.
+     The Android version has its own pages: it collects data differently. -->
 
 <h1>Beauty Stuff for iPhone — Privacy Policy</h1>
-<p class="updated">In effect since 25 August 2026 · <a href="ru/">Русская версия</a></p>
+<p class="updated">In force since 5 September 2026 · <a href="ru/">Русская версия</a></p>
 
 <div class="summary">
   <p><strong>In short:</strong></p>
   <ul>
-    <li>everything you put into the app — products, dates, photos, shopping list — is kept
-      on your device only;</li>
-    <li>what leaves the device is crash reports and anonymous usage statistics, handled by
-      the Google services described below;</li>
-    <li>a backup — and a picture of your year summary or your collage — leaves the app only
-      when you ask for it, into the file or the app you choose;</li>
-    <li>no account is needed, there are no ads, the advertising identifier is not collected,
-      and the data is not sold to anyone.</li>
+    <li>your bag lives on your device and works entirely without a network, without signing in
+      and without a subscription — just as before;</li>
+    <li>signing in and syncing are your choice. Turn them on and you create an account, and
+      a copy of your bag with its photos starts being stored in the cloud;</li>
+    <li>reading a label and getting advice are paid features. The photo goes to our server and
+      on to Anthropic, which reads it; we ask you about this separately, before the first
+      request;</li>
+    <li>crash reports and anonymous usage statistics still leave the device — Google services;</li>
+    <li>there are no ads, no advertising identifier is collected, and no data is ever sold.</li>
   </ul>
 </div>
 
 <h2>Who is responsible for the data</h2>
 <p>Beauty Stuff is developed and maintained by a private individual. Questions about data,
-deletion requests and anything else go to
-<a href="mailto:basilkot@gmail.com">basilkot@gmail.com</a>.</p>
+deletion requests and anything else — <a href="mailto:basilkot@gmail.com">basilkot@gmail.com</a>.</p>
 
 <h2>What is kept on the device</h2>
-<p>Everything the app holds stays in the phone memory and is never sent anywhere:</p>
+<p>The contents of your bag live in the phone’s memory:</p>
 <ul>
-  <li>products — name, brand, category, note, price, the dates of purchase, opening and
-    expiration, and the reason a product was archived;</li>
+  <li>products — name, brand, category, volume, price, note, the dates of purchase, opening
+    and expiry, and the reason a product was archived;</li>
   <li>product photos;</li>
-  <li>the lists of brands and categories;</li>
-  <li>the shopping list;</li>
-  <li>app settings — whether reminders are on, and at what time, for example.</li>
+  <li>the ingredient list, if you typed it in or read it from a photo;</li>
+  <li>the brand and category catalogues, care routines, the shopping list;</li>
+  <li>app settings — whether reminders are on, and at what time.</li>
 </ul>
-<p>The records live in the app database, the photos in its own directory. Neither is available
-to other apps. The home screen widget reads the same database and never leaves the device.
-Uninstalling Beauty Stuff erases all of it along with the app.</p>
+<p>Records live in the app’s database, photos in its own folder. Neither is available to other
+apps. Deleting Beauty Stuff erases all of it along with the app.</p>
+<p>Until you sign in, that is all there is: the app works without a network, and the contents
+of your bag go nowhere.</p>
 
-<h2>What leaves the device</h2>
-<p>The app uses two services from Google LLC. Both receive data automatically; nothing
-is required from you.</p>
+<h2>Your account</h2>
+<p>Signing in is needed for syncing and for the paid features; without them it is not required.
+Signing in uses Sign in with Apple, and accounts are kept by Firebase Authentication, a service
+of Google LLC. What is stored about you:</p>
+<ul>
+  <li>an e-mail address — we use it to warn you before data is deleted;</li>
+  <li>an internal account identifier — your cloud data is found by it.</li>
+</ul>
+<p class="note">If you chose “Hide My Email” when signing in, we receive an Apple relay address
+of the form <code>…@privaterelay.appleid.com</code> rather than your real one. Mail reaches you
+through it, and we never learn the address itself. The app never sees or stores your Apple ID
+password: signing in is handled by the system.</p>
+
+<h2>Syncing</h2>
+<p>You turn syncing on, and you turn it off. While it is off, nothing listed below leaves
+the device.</p>
+<p>When it is on, the contents of your bag are copied to the cloud:</p>
+<ul>
+  <li>products with every field, including notes and the parsed ingredient list;</li>
+  <li>product photos — a small copy right away, the full shot on demand;</li>
+  <li>the brand and category catalogues, routines, the shopping list, advice;</li>
+  <li>markers of what you deleted, so the deletion reaches your second device.</li>
+</ul>
+<p>Records are stored in Cloud Firestore, photos in Firebase Cloud Storage; both services belong
+to Google LLC. The data sits in a section marked with your identifier, and the access rules are
+such that only someone signed in as you can read it. We do not read the contents of your bag.</p>
+<p>Turning syncing off stops the exchange but does not by itself erase what has already been
+sent. How to delete it — see “How long it is kept” below.</p>
+
+<h2>Reading photos and giving advice</h2>
+<p>These are paid features. They work through our server, which calls a language model from
+Anthropic PBC (USA). Nothing goes there directly from the app.</p>
+<p><strong>Before the first request the app shows a separate screen</strong> with the same list
+as below, and sends nothing without your agreement. You can switch these features off entirely
+in the app’s settings — everything else keeps working as before.</p>
+
+<h3>What is sent</h3>
+<ul>
+  <li>the photo you have just taken or picked;</li>
+  <li>the product photo from the card — as a second image and only if it already exists.
+    It helps make sense of what the label belongs to;</li>
+  <li>the fields you have already filled in — name, brand, category, volume;</li>
+  <li>the app’s language, so the answer comes back in it;</li>
+  <li>for advice about your bag — the list of your products: category, brand, name and dates.</li>
+</ul>
+<p><strong>Notes on products are never sent</strong> — neither when reading a label nor for
+advice. They are the most personal thing in the bag, and they stay on the device.</p>
+
+<h3>What happens next</h3>
+<p>Anthropic receives the above in order to answer the request. How that company handles what
+it receives is described in its
+<a href="https://www.anthropic.com/legal/privacy">privacy policy</a> and
+<a href="https://www.anthropic.com/legal/commercial-terms">commercial terms</a>.</p>
+<p>Our server keeps:</p>
+<ul>
+  <li>the model’s answer — the parsed fields, ingredients or tips — together with a fingerprint
+    of the request. It exists so that repeating the same request is free: if the connection
+    dropped or you cancelled the wait, the second attempt costs you nothing;</li>
+  <li>a monthly request counter, from which the remaining quota is calculated.</li>
+</ul>
+<p>The photos themselves are not stored on our server. They pass through it to the model and
+do not remain in storage.</p>
+
+<h2>Subscription</h2>
+<p>Payment goes through the App Store. Card and payment details are handled by Apple; the app
+never sees them. The app learns the state of the subscription — active, renewed or cancelled —
+from the App Store and ties it to your account, so that the paid features open on all your
+devices.</p>
+
+<h2>App verification</h2>
+<p>So that other programs cannot call our server, Firebase App Check with App Attest is used:
+Apple confirms that the request came from a genuine copy of Beauty Stuff. The contents of your
+bag take no part in that check.</p>
+
+<h2>Crash reports and statistics</h2>
 
 <h3>Crash reports — Firebase Crashlytics</h3>
 <p>When the app crashes or trips over an error, a technical report is sent:</p>
 <ul>
-  <li>the error type and the call stack;</li>
-  <li>device model, iOS version, amount of free memory;</li>
-  <li>app version and a technical installation identifier.</li>
+  <li>the error type and call stack;</li>
+  <li>device model, iOS version, free memory;</li>
+  <li>app version and an internal installation identifier.</li>
 </ul>
-<p>The contents of your collection, the photos and the product names never end up in a report.</p>
+<p>The contents of your bag, photos and product names never appear in a report.</p>
 
 <h3>Usage statistics — Google Analytics for Firebase</h3>
-<p>Anonymous information on how the app is used is collected: launches and session length,
-the screens opened, and a handful of events — a product added, a product archived, a backup
-saved or restored, reminders switched on. Product names, brand names and photos never end up
-in the statistics.</p>
-<p>The app <strong>does not collect the device advertising identifier (IDFA)</strong> and does
-not track you across other apps and websites. That is why the system tracking prompt is never
-shown.</p>
-<p>How Google handles the data it receives is described in the
-<a href="https://policies.google.com/privacy">Google Privacy Policy</a> and in the
-<a href="https://firebase.google.com/terms/data-processing-terms">Firebase terms</a>.</p>
+<p>The library collects anonymous information about how the app is used: launches and moves
+between screens, device model, iOS version, language and approximate country. The app also
+sends a few events about the purchase screen — whether it was opened, which tier was chosen and
+how it ended — so that breakages such as an empty purchase screen get noticed.</p>
+<p><strong>The advertising identifier (IDFA) is not collected</strong>, the app does not ask for
+tracking permission, and no user profile is built from this data. The contents of your bag never
+appear in these events: what leaves is the shape of a purchase, not the purchaser.</p>
+<p class="note">How Google handles what it receives is described in the
+<a href="https://policies.google.com/privacy">Google Privacy Policy</a> and the
+<a href="https://firebase.google.com/terms">Firebase terms</a>.</p>
 
 <h2>Backups</h2>
 
 <h3>The backup you make</h3>
-<p>On “Save a backup” the app builds a single file with the products, the lists, the shopping
-list and the photos, and hands it to the system share dialog. Where the file goes — to Files,
-to iCloud Drive, to an email to yourself — is your choice. The app never sends the backup
-anywhere by itself and has no access to your other files.</p>
+<p>“Save a backup” collects a file with products, catalogues and photos and hands it to the
+system sheet — you choose where it goes: Files, iCloud Drive, or anywhere else. The app never
+sends the backup anywhere by itself and has no access to your other files.</p>
 
 <h3>The backup iOS makes</h3>
-<p>If iCloud Backup is enabled on the device, or you back the device up to a computer, the
-operating system saves the app data along with the product photos on its own. This is done
-by iOS, not by the app: Beauty Stuff has no access to the contents of that backup. It can be
-turned off in the device settings, under “iCloud → iCloud Backup”.</p>
+<p>If iCloud Backup is on, the system copies the app’s data along with everything else. That is
+done by iOS, not by the app: Beauty Stuff has no access to the contents of such a backup. It can
+be turned off in the device settings.</p>
 
 <h2>Pictures you share</h2>
-<p>The year summary and the collage become a picture only when you tap “Share”, and that
-picture goes to the same system dialog the backup uses: where it lands — a messenger, a note,
-the photo library — is your choice. The app sends it nowhere by itself.</p>
-<p>The collage can show the products with the background removed. That is done on the device
-by the system framework, without a network and without sending the photos anywhere, and the
-original photos are not modified: the cut-out lives only while the screen is open.</p>
+<p>A collage or a year summary becomes an image and is handed to the system share sheet. Where
+it goes is up to you; the app never sends it anywhere by itself.</p>
+
+<h2>How long it is kept</h2>
+<p>Data on the device lives until you delete it, or delete the app.</p>
+<p>The cloud copy lives as long as you use it. If there has been no syncing for six months, the
+copy is deleted along with the photos and the account. A month before that we write to your
+account’s address, so that you have time to come back and lose nothing simply by opening the app.
+We never delete without warning.</p>
+<p>The bag on your phone stays where it is: only the cloud copy is deleted.</p>
+<p>You can delete everything at once yourself: Settings → Syncing → Delete account. The cloud
+records, the photos and the account itself are erased.</p>
 
 <h2>Permissions and what they are for</h2>
 <ul>
-  <li><strong>Notifications</strong> — to remind you that a product is about to expire.
-    The permission is asked only when you switch reminders on yourself in the app settings.
-    If you decline, the app keeps working, but no reminders will arrive.</li>
-  <li><strong>Camera</strong> — to take a photo of a product for its page. Asked the first time
-    you take one. Without it you can still pick a photo you already have.</li>
-  <li><strong>Adding to the photo library</strong> — to save a picture you are sharing: a collage
-    or the year summary. Asked only if you pick “Save Image” in the share dialog. If you decline,
-    the picture can still be sent anywhere else.</li>
+  <li><strong>Camera</strong> — to photograph packaging in order to read the marking, the
+    ingredient list, or to fill in the card. Permission is asked at the moment you open the
+    camera, and refusing closes only that.</li>
+  <li><strong>Notifications</strong> — to remind you about expiring dates. Permission is asked
+    when you turn reminders on; without it the app works, but reminders will not arrive.</li>
+  <li><strong>Adding to the photo library</strong> — only to save a collage or year-summary
+    picture, if you asked for it. The app cannot read your library: a photo is chosen through
+    the system sheet, which hands over the one image you picked.</li>
 </ul>
-<p>The app never asks to read your photo library: a photo for a product page is picked in a system
-dialog that hands over the selected image and nothing else. Beauty Stuff has no access to any
-other photo on the device — including the ones you saved to the library yourself.</p>
 
 <h2>Children</h2>
-<p>The app is not directed at children under 13 and does not knowingly collect their data.</p>
+<p>The app is not aimed at children under 13 and does not knowingly collect their data.</p>
 
 <h2>Your rights</h2>
 <ul>
-  <li>The data on the device is yours to control: any record can be edited or deleted in the app,
-    and deleting the app erases everything at once.</li>
-  <li>You can take your data with you at any moment — “Save a backup” in the settings.</li>
-  <li>To ask for the crash reports and statistics tied to your installation to be deleted, write
-    to <a href="mailto:basilkot@gmail.com">basilkot@gmail.com</a>.</li>
+  <li>the data on your device is yours to control: any record can be changed or deleted in the
+    app, and deleting the app erases everything at once;</li>
+  <li>the cloud copy and the account can be deleted from within the app at any time;</li>
+  <li>you can get a copy of your data without asking us: “Save a backup” hands you a file with
+    everything in your bag;</li>
+  <li>the AI features can be switched off in settings without losing anything else;</li>
+  <li>for any question about data — <a href="mailto:basilkot@gmail.com">basilkot@gmail.com</a>.</li>
 </ul>
 
 <h2>Changes to this policy</h2>
-<p>If the set of collected data changes, this text will be updated along with the app, and the
-date at the top of the document will change with it. By continuing to use the app after an
-update you accept the new version.</p>
+<p>If what is sent changes, this page will be updated and the date at the top will change with
+it. Significant changes are shown by the app separately — the same way it shows the agreement
+for calling the model.</p>
 
-<footer>Beauty Stuff · <a href="mailto:basilkot@gmail.com">basilkot@gmail.com</a></footer>
+<footer>
+  Beauty Stuff for iPhone · <a href="ru/">Русская версия</a>
+</footer>
 
 </body>
 </html>

@@ -44,6 +44,16 @@ export const documents: DocumentEntry[] = [
     note: 'По-русски',
   },
   {
+    href: '/beauty-stuff/delete/',
+    title: 'Beauty Stuff for Android — Deleting your account and data',
+    note: 'The address Play shows on the store listing',
+  },
+  {
+    href: '/beauty-stuff/delete/ru/',
+    title: 'Beauty Stuff для Android — удаление учётной записи и данных',
+    note: 'По-русски',
+  },
+  {
     href: '/beauty-stuff-ios/',
     title: 'Beauty Stuff for iPhone — Privacy Policy',
     note: 'The app collects data differently on iOS, so the document is separate',

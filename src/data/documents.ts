@@ -9,6 +9,12 @@
  *
  * Здесь только опись: что где лежит, чтобы корневая страница могла их перечислить,
  * а список не приходилось держать в голове.
+ *
+ * Единственное исключение из «без изменений» — `beauty-stuff/terms/policy-*.html`. Условия
+ * Android-версии ссылаются на политику соседним файлом: в приложении обе страницы лежат
+ * рядом в `assets` и открываются без сети. На сайте политика разделом выше, поэтому по тому
+ * же адресу положен переход в две строки. Сам текст не тронут — а значит, и разойтись
+ * с приложением ему негде.
  */
 export interface DocumentEntry {
   href: string
@@ -25,6 +31,16 @@ export const documents: DocumentEntry[] = [
   {
     href: '/beauty-stuff/ru/',
     title: 'Beauty Stuff для Android — политика конфиденциальности',
+    note: 'По-русски',
+  },
+  {
+    href: '/beauty-stuff/terms/',
+    title: 'Beauty Stuff for Android — Terms of Use',
+    note: 'English',
+  },
+  {
+    href: '/beauty-stuff/terms/ru/',
+    title: 'Beauty Stuff для Android — условия использования',
     note: 'По-русски',
   },
   {

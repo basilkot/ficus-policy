@@ -70,77 +70,180 @@
     </style>
 </head>
 <body>
-
-<!-- The same document is published at https://basilkot.github.io/ficus-policy/beauty-stuff/
-     (repository basilkot/ficus-policy) — Google Play requires a link on the store listing.
+<!-- This document is also published at https://basilkot.github.io/ficus-policy/beauty-stuff/
+     (repository basilkot/ficus-policy) — Google Play requires a link in the store listing.
      The source of truth is here: after editing, copy the file there unchanged.
-     The Russian version lives next to this one, in policy-ru.html. -->
+     The Russian version lives next to it, in policy-ru.html, and is published under /ru/. -->
 <h1>Beauty Stuff — Privacy Policy</h1>
-<p class="updated">In effect since 10 August 2026</p>
+<p class="updated">Effective 3 September 2026</p>
 
 <div class="summary">
     <p>In short:</p>
     <ul>
-        <li>everything you put into the app — products, dates, photos, shopping list — is kept
-            on your device only;</li>
-        <li>what leaves the device is crash reports and anonymous usage statistics, handled by the
-            Google services described below;</li>
-        <li>a backup is created only when you ask for it, into the file you choose;</li>
-        <li>no account is needed, there are no ads, and the data is not sold to anyone.</li>
+        <li>your collection lives on your device and works entirely offline, without signing in
+            and without a subscription — just as before;</li>
+        <li>signing in and syncing are your choice. Turn them on and you create an account, and
+            a copy of your collection together with its photos starts living in the cloud;</li>
+        <li>reading a product from a photo is a paid feature. The shot goes to our server and from
+            there to Anthropic, which reads it; your collection as a whole is not sent;</li>
+        <li>crash reports and anonymous usage statistics still go out — Google services;</li>
+        <li>there are no ads, and your data is not sold to anyone.</li>
     </ul>
 </div>
 
-<h2>Who is responsible for the data</h2>
+<h2>Who is responsible for your data</h2>
 <p>
-    Beauty Stuff is developed and maintained by a private individual. Questions about data,
-    deletion requests and anything else go to
+    Beauty Stuff is developed and maintained by an individual. Questions about data, deletion
+    requests and anything else — write to
     <a href="mailto:kot.julic@gmail.com">kot.julic@gmail.com</a>.
 </p>
 
-<h2>What is kept on the device</h2>
-<p>Everything the app holds stays in the phone memory and is never sent anywhere:</p>
+<h2>What is stored on your device</h2>
+<p>The contents of your collection live in your phone's memory:</p>
 <ul>
-    <li>products — name, brand, category, note, the dates of purchase, opening and expiration;</li>
+    <li>products — name, brand, category, volume, price, comment, dates of purchase, opening
+        and expiry;</li>
     <li>product photos;</li>
-    <li>the lists of brands and categories;</li>
-    <li>the shopping list;</li>
-    <li>app settings — whether reminders are on, and at what time, for example.</li>
+    <li>the ingredient list, if you typed it in or read it from a photo;</li>
+    <li>brand and category directories, care routines, shopping list;</li>
+    <li>app settings — for instance whether reminders are on and at what time.</li>
 </ul>
 <p>
-    The records live in the app database, the photos in the app private directory. Neither is
-    available to other apps. Uninstalling Beauty Stuff erases all of it along with the app.
+    Records live in the app's database, photos in the app's own directory. Neither is available
+    to other apps. Uninstalling Beauty Stuff erases all of it along with the app.
+</p>
+<p>
+    Until you sign in, that is all there is: the app works offline, and nothing from your
+    collection goes anywhere.
 </p>
 
-<h2>What leaves the device</h2>
+<h2>Your account</h2>
 <p>
-    The app uses two services from Google LLC. Both receive data automatically; nothing is
-    required from you.
+    Signing in is needed for syncing and for the paid features; without them it is not required.
+    Sign-in goes through your Google account, and accounts themselves are handled by Firebase
+    Authentication, a service of Google LLC. What is kept about you:
 </p>
+<ul>
+    <li>the email address of your Google account — we use it to warn you before data is deleted;</li>
+    <li>an internal account identifier — your cloud data is found by it.</li>
+</ul>
+<p>
+    The app never sees or stores your Google password: signing in is done by Android itself.
+</p>
+
+<h2>Syncing</h2>
+<p>
+    You turn syncing on and you turn it off. While it is off, nothing listed below leaves
+    your device.
+</p>
+<p>While it is on, the contents of your collection are copied to the cloud:</p>
+<ul>
+    <li>products with all their fields, including comments and ingredient lists;</li>
+    <li>product photos — the full shots, not just the thumbnails;</li>
+    <li>brand and category directories, routines, shopping list;</li>
+    <li>records of what you deleted — so that a deletion reaches your second device.</li>
+</ul>
+<p>
+    Records are stored in Cloud Firestore, photos in Firebase Cloud Storage; both services belong
+    to Google LLC. The data sits in a section marked with your identifier, and the access rules
+    are written so that only someone signed in as you can read that section. We do not read the
+    contents of your collection.
+</p>
+<p>
+    Turning syncing off stops the exchange but does not by itself erase what was already sent.
+    How to erase it is below, under “How long this is kept”.
+</p>
+
+<h2>Reading photos and advice</h2>
+<p>
+    These are paid features. They work through our server, which talks to a language model made by
+    <strong>Anthropic PBC</strong> (USA). Nothing goes to it directly from the app.
+</p>
+
+<h3>What is sent</h3>
+<ul>
+    <li>the <strong>shot</strong> you have just taken or picked;</li>
+    <li>the <strong>product photo</strong> from the card — as a second image, and only if it is
+        already on your device. It helps make out what the product on the label is;</li>
+    <li>the <strong>fields you have already filled in</strong> — name, brand, category, volume;</li>
+    <li>the <strong>app language</strong> — so that the answer comes back in it;</li>
+    <li>for advice about your collection — a list of your products: category, brand, name, dates.</li>
+</ul>
+<p>
+    <strong>Your comments on products are never sent</strong> — neither when reading a photo nor
+    for advice. They are the most personal thing in a collection, and they stay on the device.
+</p>
+
+<h3>What happens to it next</h3>
+<p>
+    Anthropic receives the above in order to answer the request. How that company handles the data
+    it receives is described in its
+    <a href="https://www.anthropic.com/legal/privacy">privacy policy</a> and
+    <a href="https://www.anthropic.com/legal/commercial-terms">developer terms</a>.
+</p>
+<p>What our own server keeps:</p>
+<ul>
+    <li>the <strong>model's answer</strong> — the extracted fields or ingredient list, together with
+        a fingerprint of the request. It is what makes repeating the same request free: if the
+        connection dropped or you cancelled the wait, the second attempt costs you nothing;</li>
+    <li>a <strong>monthly request counter</strong> — your remaining allowance is counted from it.</li>
+</ul>
+<p>
+    <strong>The photos themselves are not stored on our server.</strong> They pass through it to
+    the model and are not kept.
+</p>
+
+<h2>Subscription</h2>
+<p>
+    Payment goes through Google Play. Card details and payment information are handled by Google;
+    the app never sees them. Google Play tells our server the state of your subscription — active,
+    on hold or cancelled — and the server ties that to your account in order to unlock the paid
+    features.
+</p>
+
+<h2>Verifying the app</h2>
+<p>
+    So that our server is not called by other programs, the app uses Firebase App Check with Play
+    Integrity: Google confirms that a request came from a genuine Beauty Stuff installed from Play.
+    Nothing from your collection takes part in that check.
+</p>
+
+<h2>Crash reports and statistics</h2>
 
 <h3>Crash reports — Firebase Crashlytics</h3>
 <p>When the app crashes or trips over an error, a technical report is sent:</p>
 <ul>
     <li>the error type and the call stack;</li>
-    <li>device model, Android version, amount of free memory;</li>
-    <li>app version and a technical installation identifier.</li>
+    <li>device model, Android version, free memory;</li>
+    <li>app version and an internal installation identifier.</li>
 </ul>
-<p>The contents of your collection, the photos and the product names never end up in a report.</p>
+<p>The contents of your collection, your photos and product names are not part of the report.</p>
 
 <h3>Usage statistics — Google Analytics for Firebase</h3>
-<p>The library collects anonymous information on its own, without any calls from the app code:</p>
+<p>The library collects anonymous information about usage:</p>
 <ul>
     <li>app launches and moves between screens;</li>
     <li>device model, Android version, language and approximate country;</li>
-    <li>the device advertising identifier (Google Advertising ID) — it can be reset or opted out
-        of in the Android settings, under “Privacy → Ads”.</li>
+    <li>the device advertising identifier (Google Advertising ID) — you can reset it or opt out in
+        Android settings, under “Privacy → Ads”.</li>
 </ul>
 <p>
     This shows how many people use the app and which screens they use. No user profile is built
     from it, and no ads are shown in the app.
 </p>
+<p>
+    On top of that, the app itself sends a few events about the <strong>purchase screen</strong>:
+    whether it was opened, which feature brought you there, which tier and period were chosen,
+    whether there was a free trial, and how it ended. This is what tells us whether the offer
+    works, and what makes breakage visible — a purchase screen that opened empty, for instance.
+</p>
+<p>
+    Nothing from your collection goes into those events: what travels is the shape of the
+    purchase, not the purchaser. No product names, no ingredients, no notes.
+</p>
 <p class="note">
-    How Google handles the data it receives is described in the
-    <a href="https://policies.google.com/privacy">Google Privacy Policy</a> and in the
+    How Google handles the data it receives is described in
+    <a href="https://policies.google.com/privacy">Google's privacy policy</a> and in the
     <a href="https://firebase.google.com/support/privacy">Firebase terms</a>.
 </p>
 
@@ -148,32 +251,53 @@
 
 <h3>The backup you make</h3>
 <p>
-    On “Save a backup” the app builds a zip archive with the products, the lists and the photos,
-    and hands it to the system save dialog. Where the file goes is your choice: device storage,
-    a memory card or cloud storage. The app never sends the archive anywhere by itself and has no
-    access to your other files.
+    On “Save a backup” the app builds a zip archive with products, directories and photos and hands
+    it to the system save dialog. Where the file goes is up to you: device storage, a memory card
+    or cloud storage. The app does not send the archive anywhere by itself and has no access to
+    your other files.
 </p>
 
 <h3>The backup Android makes</h3>
 <p>
-    If Google backup is enabled in your device settings, the operating system copies the app
-    database and settings to your Google Drive on its own. Photos are not included in such a copy.
+    If Google backup is enabled in your device settings, the operating system copies the app's
+    database and settings to your Google Drive by itself. Photos are not included in such a backup.
     This is done by Android, not by the app: Beauty Stuff has no access to the contents of that
-    backup. It can be turned off in the device settings, under “Google → Backup”.
+    backup. It can be turned off in device settings, under “Google → Backup”.
+</p>
+
+<h2>How long this is kept</h2>
+<p>
+    Data on your device lives until you delete it or uninstall the app.
+</p>
+<p>
+    The cloud copy lives as long as you use it. If there has been no syncing for
+    <strong>six months</strong>, the copy is deleted along with the photos and the account.
+    A month before that we write to the address of your Google account — so that you have time
+    to come back and lose nothing, simply by opening the app. We never delete without warning.
+</p>
+<p>
+    Your collection on the phone stays where it is: only the cloud copy is deleted.
+</p>
+<p>
+    You can delete everything at once yourself: “Settings → Account → Delete account”. That erases
+    the cloud records, the photos and the account itself.
 </p>
 
 <h2>Permissions and what they are for</h2>
 <ul>
-    <li><strong>Notifications</strong> — to remind you about expiring products. If you decline,
-        the app keeps working, but no reminders will arrive.</li>
-    <li><strong>Internet and network state</strong> — only to send crash reports and statistics.
-        The app itself works entirely offline.</li>
+    <li><strong>Notifications</strong> — to remind you about expiring products. If you refuse, the
+        app keeps working, but reminders will not arrive.</li>
+    <li><strong>Camera</strong> — to read the “period after opening” symbol straight from the
+        viewfinder. The permission is asked at the moment you open that reader and only for it;
+        refusing closes only that. Nothing shot in this mode is saved anywhere.</li>
+    <li><strong>Internet and network state</strong> — for signing in, syncing, the paid features,
+        crash reports and statistics. The collection itself works offline.</li>
 </ul>
 <p>
-    The app does <strong>not</strong> ask for a separate camera or gallery permission. A photo is
-    taken by the system camera app, which hands over the finished file; a photo from the gallery is
-    picked through the system dialog, which passes on only the selected image. Beauty Stuff has no
-    access to any other photo on the device.
+    Taking an ordinary product photo needs no permission: the shot is taken by the system camera
+    app, which hands over the finished file. A photo from the gallery is picked through the system
+    dialog, which passes on only the selected image. Beauty Stuff has no access to any other
+    pictures on your device.
 </p>
 
 <h2>Children</h2>
@@ -183,20 +307,22 @@
 
 <h2>Your rights</h2>
 <ul>
-    <li>The data on the device is yours to control: any record can be changed or deleted in the
-        app, and uninstalling the app erases everything at once.</li>
+    <li>Data on your device is yours to control: any record can be changed or deleted in the app,
+        and uninstalling the app erases everything at once.</li>
+    <li>The cloud copy and the account can be deleted in the app — “Settings → Account”. Syncing
+        can be turned off without deleting anything.</li>
     <li>To ask for the crash reports and statistics tied to your installation to be deleted, write
         to <a href="mailto:kot.julic@gmail.com">kot.julic@gmail.com</a>. You will need the device
-        advertising identifier for that — it is visible in the Android settings.</li>
-    <li>Collection of the advertising identifier can be limited from within Android itself, without
+        advertising identifier — it is visible in Android settings.</li>
+    <li>Collection of the advertising identifier can be limited by Android itself, without
         uninstalling the app.</li>
 </ul>
 
 <h2>Changes to this policy</h2>
 <p>
     If what is collected changes, this text will be updated together with the app, and the date at
-    the top of the document will change with it. By continuing to use the app after an update you
-    accept the new version.
+    the top will change with it. By continuing to use the app after an update you accept the new
+    version.
 </p>
 
 <footer>

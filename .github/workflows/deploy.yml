@@ -29,9 +29,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -41,8 +41,11 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@v6
+      # Скрытые файлы в артефакт не попадают начиная с четвёртой версии — значит
+      # `public/.nojekyll` до Pages больше не доезжает. Потери в этом нет: Jekyll
+      # запускается только при публикации из ветки, а здесь отдаётся готовый артефакт
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
@@ -54,4 +57,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

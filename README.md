@@ -27,6 +27,7 @@
 | Страница перехода — то, куда ведёт короткий адрес | [`src/components/AppGate.astro`](src/components/AppGate.astro) |
 | QR, посчитанный на сборке | [`src/components/QR.astro`](src/components/QR.astro) |
 | Обвязка страницы и теги превью | [`src/layouts/Page.astro`](src/layouts/Page.astro) |
+| Картинка превью для ссылки, `og:image` | [`public/beauty/preview.png`](public/beauty/preview.png), собирается [`banner.py`](../beauty-stuff-ios/Tools/screenshots/banner.py) |
 | Счётчик и события, которые он шлёт | [`src/components/Analytics.astro`](src/components/Analytics.astro), [`src/data/analytics.ts`](src/data/analytics.ts) |
 | Политики и поддержка — целыми файлами | [`public/beauty-stuff/`](public/beauty-stuff/), [`public/beauty-stuff-ios/`](public/beauty-stuff-ios/) |
 | Их опись для корневой страницы | [`src/data/documents.ts`](src/data/documents.ts) |
@@ -134,11 +135,6 @@ anycast: за номером стоит много машин по миру, и 
 
 ## Чего ещё нет
 
-- **Идентификатор потока GA4** (`measurementId` в `src/data/analytics.ts`). Пока строка
-  пустая, наружу не уходит ничего: страница ведёт себя ровно как до счётчика. Поток
-  заводится в проекте `beauty-stuff` — веб, адрес `ficusapps.com`.
-- **Картинка превью.** `og:image` пока указывает на иконку. Для Pinterest нужен
-  горизонтальный баннер — это часть разговора про то, как выглядит сам коллаж.
 - **Отключение старого репозитория.** Копии политик уже здесь, но `ficus-policy` пока
   работает и остаётся единственным, что держит ссылки из карточек. Порядок переезда
   ниже, и он не переставляется.

@@ -1,0 +1,102 @@
+---
+import { endpoint, measurementId } from '../data/analytics'
+
+/**
+ * Счётчик — в `head` и синхронно, по той же причине, по которой синхронен переход:
+ * страница `/beauty` с телефона уходит в стор до первой отрисовки, и всё, что не успело
+ * отправиться к этому моменту, не отправится никогда.
+ *
+ * Наружу отдаётся `ficus.hit(event, params)` — им пользуются переход и кнопки магазинов.
+ * Без идентификатора это пустая функция: вызовы остаются на месте, а запросов нет.
+ */
+---
+
+<script is:inline define:vars={{ tid: measurementId, endpoint }}>
+  ;(function () {
+    // Один на загрузку страницы: по нему GA4 склеивает события одного показа
+    var page = String(Math.floor(Math.random() * 2147483647))
+    var sent = 0
+
+    /**
+     * Значение, которое переживает переход, — или новое, если пережить не вышло.
+     *
+     * Приватный режим Safari бросает при обращении к хранилищу, и это не повод молчать:
+     * счётчик без памяти считает каждый заход новым человеком, но продолжает считать.
+     * `fresh` — правда ли значение только что придумано: по нему отличается первый визит
+     * и начало сессии.
+     */
+    function keep(store, key, make) {
+      try {
+        var value = store.getItem(key)
+        if (value) return { value: value, fresh: false }
+        value = make()
+        store.setItem(key, value)
+        return { value: value, fresh: true }
+      } catch (error) {
+        return { value: make(), fresh: true }
+      }
+    }
+
+    // Человек — в `localStorage`, сессия — в `sessionStorage`: вкладка закрылась,
+    // сессия кончилась, человек остался. Ровно то разделение, которое GA4 и ждёт
+    var visitor = keep(localStorage, 'ficus.cid', function () {
+      return page + '.' + Math.floor(Date.now() / 1000)
+    })
+    var session = keep(sessionStorage, 'ficus.sid', function () {
+      return String(Math.floor(Date.now() / 1000))
+    })
+
+    // Который это заход. Число нужно отчётам «новые и вернувшиеся», и считать его,
+    // кроме нас, некому
+    var visits = 1
+    try {
+      visits = Number(localStorage.getItem('ficus.sct') || 0) + (session.fresh ? 1 : 0)
+      localStorage.setItem('ficus.sct', String(visits))
+    } catch (error) {
+      /* без хранилища каждый заход первый — так и запишем */
+    }
+
+    function hit(name, params) {
+      sent += 1
+
+      var query = [
+        'v=2',
+        'tid=' + tid,
+        'cid=' + visitor.value,
+        '_p=' + page,
+        'sid=' + session.value,
+        'sct=' + visits,
+        // «Сессия содержательная»: без этого GA4 считает все заходы отказами, а здесь
+        // уход в стор — не отказ, а удача
+        'seg=1',
+        '_s=' + sent,
+        // Время на странице, которого у этой страницы нет: с телефона она уходит
+        // за миллисекунды. Единица — не измерение, а признак «человек тут был»:
+        // без неё GA4 не засчитывает вовлечённость, сколько ни ставь `seg`
+        '_et=1',
+        'en=' + encodeURIComponent(name),
+        'dl=' + encodeURIComponent(location.href),
+        'dt=' + encodeURIComponent(document.title),
+        'ul=' + encodeURIComponent((navigator.language || '').toLowerCase()),
+        'sr=' + screen.width + 'x' + screen.height,
+      ]
+
+      if (document.referrer) query.push('dr=' + encodeURIComponent(document.referrer))
+      if (sent === 1 && visitor.fresh) query.push('_fv=1')
+      if (sent === 1 && session.fresh) query.push('_ss=1')
+
+      for (var key in params) {
+        if (params[key]) query.push('ep.' + key + '=' + encodeURIComponent(params[key]))
+      }
+
+      try {
+        navigator.sendBeacon(endpoint + '?' + query.join('&'))
+      } catch (error) {
+        /* счётчик не та вещь, ради которой ломают страницу */
+      }
+    }
+
+    window.ficus = { hit: tid ? hit : function () {} }
+    window.ficus.hit('page_view')
+  })()
+</script>

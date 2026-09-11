@@ -71,6 +71,26 @@ const qrTarget = new URL(`/${app.slug}?from=qr`, Astro.site).toString()
   // страница читается как сбой, даже когда всё сработало
   ;(function () {
     var params = new URLSearchParams(location.search)
+
+    // Платформа отправителя приезжает отдельным параметром и склеивается с меткой:
+    // приложение знает, что за картинка и откуда ушло, а как это назвать в отчёте —
+    // дело этой страницы
+    var campaign = params.get('from')
+    var via = params.get('via')
+
+    // **Метка разбирается до всех развилок и один раз.** Дорог в стор две — переход
+    // и кнопки, — и обе обязаны нести одну метку. Второй разбор в скрипте кнопок
+    // однажды разошёлся бы с этим, а расхождение здесь молчаливое: ссылки рабочие,
+    // неверен только отчёт
+    window.ficusGate = {
+      // `tag`, а не `campaign`: у GA4 есть своё измерение с таким именем — источник
+      // трафика, — и одноимённый параметр события встал бы рядом с ним в отчётах
+      // неразличимой парой
+      tag: campaign || 'none',
+      via: via || 'none',
+      link: links[campaign + '_' + via] || links[campaign] || links[fallback],
+    }
+
     // Чтобы страницу можно было открыть и посмотреть с телефона — иначе она недоступна
     // тому единственному, кто её правит
     if (params.has('stay')) return
@@ -82,15 +102,18 @@ const qrTarget = new URL(`/${app.slug}?from=qr`, Astro.site).toString()
     var isAndroid = /Android/.test(ua)
     if (!isIOS && !isAndroid) return
 
-    // Платформа отправителя приезжает отдельным параметром и склеивается с меткой:
-    // приложение знает, что за картинка и откуда ушло, а как это назвать в отчёте —
-    // дело этой страницы
-    var campaign = params.get('from')
-    var via = params.get('via')
-    var link = links[campaign + '_' + via] || links[campaign] || links[fallback]
+    // Единственное место, где видно, что человек дошёл до стора. Уходит `sendBeacon`,
+    // и потому переживает навигацию: обычный запрос браузер оборвал бы на середине
+    window.ficus.hit('store_open', {
+      tag: window.ficusGate.tag,
+      via: window.ficusGate.via,
+      store: isIOS ? 'ios' : 'android',
+      mode: 'redirect',
+    })
+
     // `replace`, а не `href`: иначе кнопка «назад» возвращает на эту же страницу,
     // которая тут же уводит обратно в стор, и выйти из неё нельзя
-    location.replace(isIOS ? link.ios : link.android)
+    location.replace(isIOS ? window.ficusGate.link.ios : window.ficusGate.link.android)
   })()
 </script>
 
@@ -102,9 +125,12 @@ const qrTarget = new URL(`/${app.slug}?from=qr`, Astro.site).toString()
   <p class="note" data-role="opening">{copy.open}</p>
 
   <p class="note">{copy.manual}</p>
+  {/* Метка сайта — то, что видно без скрипта: разметка собирается заранее и метки прихода
+      знать не может. Скрипт заменяет её на настоящую, а без скрипта ссылка остаётся рабочей,
+      просто приход засчитывается сайту */}
   <div class="stores">
-    <a class="store" href={links.site.ios}>{copy.appStore}</a>
-    <a class="store" href={links.site.android}>{copy.play}</a>
+    <a class="store" href={links.site.ios} data-store="ios">{copy.appStore}</a>
+    <a class="store" href={links.site.android} data-store="android">{copy.play}</a>
   </div>
 
   <div class="scan">
@@ -117,6 +143,31 @@ const qrTarget = new URL(`/${app.slug}?from=qr`, Astro.site).toString()
   // «Открываем магазин…» показывается только тем, кого действительно уводят. На компьютере
   // эта строка была бы обещанием, которое никто не собирается выполнять
   document.querySelector('[data-role="opening"]').hidden = true
+
+  // Второй путь в стор — нажатие руками. Тот же вопрос, что у перехода, но другой ответ:
+  // сюда попадают те, кого не увело, то есть компьютер, планшет и `?stay=1`. Слитые
+  // в одно число, эти два пути не покажут, работает ли автоматический переход вообще
+  ;(function () {
+    var gate = window.ficusGate
+    document.querySelectorAll('[data-store]').forEach(function (button) {
+      var store = button.dataset.store
+
+      // **Кнопка несёт ту метку, с которой человек пришёл, а не метку сайта.** Коллаж,
+      // открытый с компьютера, приводит в стор через кнопку — и до этой правки такая
+      // установка приезжала в отчёт приходом с сайта, то есть картиночный канал терял
+      // ровно тех, кто не носит ссылку в кармане
+      button.href = gate.link[store]
+
+      button.addEventListener('click', function () {
+        window.ficus.hit('store_open', {
+          tag: gate.tag,
+          via: gate.via,
+          store: store,
+          mode: 'manual',
+        })
+      })
+    })
+  })()
 </script>
 
 <style>

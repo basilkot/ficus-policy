@@ -6,6 +6,8 @@
  * попадает не страница, а её карточка — картинка с заголовком. Без `og:*` карточка
  * собирается из чего попало, и пин, который должен вести в стор, выглядит как ошибка.
  */
+import Analytics from '../components/Analytics.astro'
+
 interface Props {
   title: string
   description: string
@@ -39,6 +41,9 @@ const previewURL = preview ? new URL(preview, Astro.site) : undefined
     <meta name="twitter:card" content={previewURL ? 'summary_large_image' : 'summary'} />
 
     <link rel="icon" href="/favicon.png" />
+
+    <!-- После `title` и `og:*`: счётчик читает заголовок страницы, а не выдумывает его -->
+    <Analytics />
 
     <style is:global>
       /* Цвет один и тот же с приложением: #006A60 — его `primary` в Material-теме.

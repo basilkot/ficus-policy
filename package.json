@@ -9,7 +9,7 @@
     "check": "astro check"
   },
   "devDependencies": {
-    "astro": "^5.18.2",
+    "astro": "^7.3.2",
     "qrcode": "^1.5.4"
   }
 }

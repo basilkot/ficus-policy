@@ -42,6 +42,11 @@ const previewURL = preview ? new URL(preview, Astro.site) : undefined
 
     <link rel="icon" href="/favicon.png" />
 
+    <!-- Подтверждение сайта в Pinterest: по нему пины с нашими адресами показывают профиль,
+         а в статистике видны сохранения с сайта. Тег выдан аккаунту Beauty Stuff 2026-09-13
+         и нужен на каждой странице: какую из них проверит робот, не сказано -->
+    <meta name="p:domain_verify" content="7a4cec310be4c335eb5d67bd8383afd8" />
+
     <!-- После `title` и `og:*`: счётчик читает заголовок страницы, а не выдумывает его -->
     <Analytics />
 

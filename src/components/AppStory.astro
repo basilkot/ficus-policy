@@ -55,6 +55,7 @@ const copy = {
     appStore: 'Download on the App Store',
     play: 'Get it on Google Play',
     contact: 'Questions or ideas? Write to',
+    calculator: 'Holding a product right now? Check its expiration date →',
   },
   ru: {
     howTitle: 'Как это работает',
@@ -73,6 +74,7 @@ const copy = {
     appStore: 'Загрузить в App Store',
     play: 'Доступно в Google Play',
     contact: 'Вопросы и идеи — пишите на',
+    calculator: 'Баночка уже в руках? Посчитайте её срок годности →',
   },
 }[lang]
 
@@ -123,6 +125,12 @@ const links = { ios: appStoreURL(app, 'site'), android: playStoreURL(app, 'site'
     <p>{copy.paid}</p>
   </div>
   <p class="terms">{copy.terms}</p>
+
+  {/* Внутренняя ссылка — единственный способ, которым поисковик узнаёт о калькуляторе
+      без карты сайта; и тому, кто пришёл с конкретной баночкой в руке, ответ нужен сейчас */}
+  <p class="terms">
+    <a href={lang === 'ru' ? `/ru/${app.slug}/calculator` : `/${app.slug}/calculator`}>{copy.calculator}</a>
+  </p>
 </section>
 
 <section class="closing">

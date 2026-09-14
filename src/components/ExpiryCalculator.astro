@@ -1,0 +1,610 @@
+---
+import { appStoreURL, playStoreURL, type AppEntry } from '../data/apps'
+
+/**
+ * Калькулятор срока годности: дата вскрытия + значок PAO (+ срок на упаковке) → до какого числа.
+ *
+ * Зачем он сайту. Разбор поисковых подсказок 12 сентября показал, что самый крупный кластер
+ * запросов про сроки косметики просит не текст, а инструмент: «makeup expiration date
+ * calculator», «checker». Приложение делает ровно это для каждой баночки, поэтому под ответом
+ * стоит одна фраза о нём и кнопки со своей меткой `calculator` — по ней в отчётах сторов
+ * видно, приводит ли страница кого-нибудь.
+ *
+ * **Считает так же, как приложение** (`ProductLifecycle.periodDates` на Android): вскрытие
+ * плюс N месяцев, а если на упаковке есть свой срок — более ранняя из двух дат. Месяцы
+ * прибавляются с прижатием к концу месяца, как `Calendar.add`: 31 января + 1 месяц —
+ * 28 февраля, а не 3 марта. Разойдись здесь арифметика с приложением, человек увидел бы
+ * две разные даты для одной баночки.
+ *
+ * **Расшифровки батч-кода нет и не будет**, хотя её тоже ищут: у каждого производителя своя
+ * схема, и уверенно выданная неверная дата — худшее, что может сделать страница про сроки
+ * ([docs/paid-features.md], «Чего не делаем»).
+ *
+ * Всё считается в браузере: сервера у сайта нет, и для арифметики над двумя датами он не нужен.
+ */
+interface Props {
+  app: AppEntry
+  lang: 'en' | 'ru'
+}
+
+const { app, lang } = Astro.props
+
+/** Те же значения, что в форме приложения (`ProductEditView.periodOptions`). */
+const periods = [1, 2, 3, 6, 9, 12, 18, 24, 30, 36]
+
+const copy = {
+  en: {
+    title: 'Makeup expiration date calculator',
+    lead: 'Find out how long a product is still good once you have opened it.',
+    opened: 'When did you open it?',
+    pao: 'The open jar symbol on the package',
+    paoHint: 'A little open jar with a number: 6M means six months after opening. Look on the back, the bottom or the crimp of the tube.',
+    exp: 'Expiry date on the package',
+    expOptional: 'optional',
+    expHint: 'Printed as EXP or “best before”. It counts until the end of that month.',
+    month: 'Month',
+    year: 'Year',
+    none: '—',
+    empty: 'Pick the number from the symbol — the answer appears here.',
+    useUntil: 'Good until',
+    // Формы по числу: [одна, много]. `{n}` подставляется в браузере
+    left: ['{n} day left', '{n} days left'],
+    today: 'Expires today',
+    expired: ['Expired {n} day ago', 'Expired {n} days ago'],
+    byPao: ['{n} month after opening.', '{n} months after opening.'],
+    byExp: 'The date on the package comes first, so it wins.',
+    guideTitle: 'Can’t find the symbol?',
+    guideLead: 'These are common ranges. The symbol on your own product always wins over this list.',
+    guide: [
+      ['Mascara, liquid eyeliner', '3–6 months'],
+      ['Liquid foundation, concealer', '6–12 months'],
+      ['Face creams, serums', '6–12 months'],
+      ['Lipstick, lip gloss', '12–24 months'],
+      ['Powder, blush, eyeshadow', '12–24 months'],
+      ['Sunscreen', 'use the date on the package'],
+    ],
+    pitch: 'Beauty Stuff does this for every product in your makeup bag and reminds you before anything expires. Free on iPhone and Android.',
+    appStore: 'Download on the App Store',
+    play: 'Get it on Google Play',
+    noscript: 'The calculator needs JavaScript turned on.',
+    months: [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
+    ],
+    locale: 'en-US',
+  },
+  ru: {
+    title: 'Калькулятор срока годности косметики',
+    lead: 'Узнайте, сколько ещё можно пользоваться средством после вскрытия.',
+    opened: 'Когда открыли?',
+    pao: 'Значок открытой баночки на упаковке',
+    paoHint: 'Открытая баночка с числом: 6M — шесть месяцев после вскрытия. Ищите на обороте, на донышке или на завальцовке тюбика.',
+    exp: 'Срок годности на упаковке',
+    expOptional: 'необязательно',
+    expHint: 'Обозначается EXP или «годен до». Считается до конца указанного месяца.',
+    month: 'Месяц',
+    year: 'Год',
+    none: '—',
+    empty: 'Выберите число со значка — ответ появится здесь.',
+    useUntil: 'Годно до',
+    // Формы по числу: [один, два–четыре, пять и больше]
+    left: ['Остался {n} день', 'Осталось {n} дня', 'Осталось {n} дней'],
+    today: 'Срок истекает сегодня',
+    expired: ['Срок истёк {n} день назад', 'Срок истёк {n} дня назад', 'Срок истёк {n} дней назад'],
+    byPao: ['{n} месяц после вскрытия.', '{n} месяца после вскрытия.', '{n} месяцев после вскрытия.'],
+    byExp: 'Дата на упаковке наступает раньше — считается она.',
+    guideTitle: 'Не нашли значок?',
+    guideLead: 'Это обычные сроки. Значок на вашем средстве всегда важнее этого списка.',
+    guide: [
+      ['Тушь, жидкая подводка', '3–6 месяцев'],
+      ['Тональный крем, консилер', '6–12 месяцев'],
+      ['Кремы для лица, сыворотки', '6–12 месяцев'],
+      ['Помада, блеск для губ', '12–24 месяца'],
+      ['Пудра, румяна, тени', '12–24 месяца'],
+      ['Солнцезащитный крем', 'смотрите дату на упаковке'],
+    ],
+    pitch: 'Beauty Stuff считает это для каждого средства в косметичке и напоминает заранее, пока срок не истёк. Бесплатно на iPhone и Android.',
+    appStore: 'Загрузить в App Store',
+    play: 'Доступно в Google Play',
+    noscript: 'Для калькулятора нужен включённый JavaScript.',
+    months: [
+      'январь', 'февраль', 'март', 'апрель', 'май', 'июнь',
+      'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь',
+    ],
+    locale: 'ru-RU',
+  },
+}[lang]
+
+// Фразы с числом собираются в браузере: число дней известно только там
+const phrases = { left: copy.left, today: copy.today, expired: copy.expired, byPao: copy.byPao, byExp: copy.byExp }
+
+// Годы на упаковке: от прошлого до пяти вперёд. Дальше пяти лет сроков у косметики не бывает,
+// а прошлый год нужен тому, кто разбирает старую косметичку
+const thisYear = new Date().getFullYear()
+const years = Array.from({ length: 7 }, (_, i) => thisYear - 1 + i)
+
+const links = { ios: appStoreURL(app, 'calculator'), android: playStoreURL(app, 'calculator') }
+---
+
+<main class="calc">
+  <a class="app" href={lang === 'ru' ? `/ru/${app.slug}?stay=1` : `/${app.slug}?stay=1`}>
+    <img src={app.icon} alt="" width="28" height="28" />
+    {app.name}
+  </a>
+
+  <h1>{copy.title}</h1>
+  <p class="lead">{copy.lead}</p>
+
+  <noscript><p class="note">{copy.noscript}</p></noscript>
+
+  <form class="form" data-calc onsubmit="return false">
+    <label class="field">
+      <span class="label">{copy.opened}</span>
+      <input type="date" name="opened" required />
+    </label>
+
+    <fieldset class="field">
+      <legend class="label">{copy.pao}</legend>
+      <div class="pao-row">
+        {/* Значок нарисован, а не описан словами: его ищут глазами на упаковке, и картинка
+            узнаётся быстрее, чем «открытая баночка» */}
+        <svg class="jar" viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M14 26h36l-3 30H17z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
+          <path d="M16 20l32-12 2 6-32 12z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
+          <text x="32" y="47" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">12M</text>
+        </svg>
+        <p class="hint">{copy.paoHint}</p>
+      </div>
+      <div class="chips">
+        {
+          periods.map((months) => (
+            <label class="chip">
+              <input type="radio" name="pao" value={months} />
+              <span>{months}M</span>
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+
+    <fieldset class="field">
+      <legend class="label">
+        {copy.exp} <span class="optional">({copy.expOptional})</span>
+      </legend>
+      <div class="exp">
+        <select name="expMonth" aria-label={copy.month}>
+          <option value="">{copy.month}</option>
+          {copy.months.map((name, index) => <option value={index}>{name}</option>)}
+        </select>
+        <select name="expYear" aria-label={copy.year}>
+          <option value="">{copy.year}</option>
+          {years.map((year) => <option value={year}>{year}</option>)}
+        </select>
+      </div>
+      <p class="hint">{copy.expHint}</p>
+    </fieldset>
+  </form>
+
+  <section class="result" data-result aria-live="polite">
+    <p class="empty" data-empty>{copy.empty}</p>
+    <div data-answer hidden>
+      <p class="until-label">{copy.useUntil}</p>
+      <p class="until" data-until></p>
+      <p class="left" data-left></p>
+      <p class="why" data-why></p>
+    </div>
+  </section>
+
+  <section class="pitch" data-pitch hidden>
+    <p>{copy.pitch}</p>
+    <div class="stores">
+      <a class="store" href={links.ios} data-calc-store="ios">{copy.appStore}</a>
+      <a class="store" href={links.android} data-calc-store="android">{copy.play}</a>
+    </div>
+  </section>
+
+  <details class="guide">
+    <summary>{copy.guideTitle}</summary>
+    <p class="hint">{copy.guideLead}</p>
+    <table>
+      <tbody>
+        {
+          copy.guide.map(([what, how]) => (
+            <tr>
+              <th scope="row">{what}</th>
+              <td>{how}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </details>
+</main>
+
+<script is:inline define:vars={{ phrases, locale: copy.locale }}>
+  ;(function () {
+    var form = document.querySelector('[data-calc]')
+    var opened = form.elements.opened
+    var expMonth = form.elements.expMonth
+    var expYear = form.elements.expYear
+
+    var empty = document.querySelector('[data-empty]')
+    var answer = document.querySelector('[data-answer]')
+    var until = document.querySelector('[data-until]')
+    var left = document.querySelector('[data-left]')
+    var why = document.querySelector('[data-why]')
+    var pitch = document.querySelector('[data-pitch]')
+
+    var format = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' })
+    var reported = false
+
+    // Дата без времени, в местном часовом поясе. `new Date('2026-09-14')` читается как полночь
+    // по UTC, и к западу от Гринвича превращается во вчерашний вечер — ответ съезжал бы на день
+    function parseDay(value) {
+      var parts = value.split('-').map(Number)
+      return new Date(parts[0], parts[1] - 1, parts[2])
+    }
+
+    function toInputValue(date) {
+      var month = String(date.getMonth() + 1).padStart(2, '0')
+      var day = String(date.getDate()).padStart(2, '0')
+      return date.getFullYear() + '-' + month + '-' + day
+    }
+
+    // Как `Calendar.add(MONTH, n)`: день прижимается к концу месяца. `setMonth` сам этого
+    // не делает — 31 января + 1 месяц он превращает в 3 марта
+    function addMonths(date, months) {
+      var target = new Date(date.getFullYear(), date.getMonth() + months, 1)
+      var lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate()
+      target.setDate(Math.min(date.getDate(), lastDay))
+      return target
+    }
+
+    function daysBetween(from, to) {
+      // Через UTC-полночи, чтобы переход на летнее время не отнимал у разницы час и день
+      var a = Date.UTC(from.getFullYear(), from.getMonth(), from.getDate())
+      var b = Date.UTC(to.getFullYear(), to.getMonth(), to.getDate())
+      return Math.round((b - a) / 86400000)
+    }
+
+    // Форма слова по числу. Три формы — русское правило, две — английское;
+    // выбирается по тому, сколько форм передано, а не по языку страницы
+    function phrase(forms, n) {
+      var index
+      if (forms.length === 3) {
+        var mod10 = n % 10
+        var mod100 = n % 100
+        index = mod10 === 1 && mod100 !== 11 ? 0 : mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14) ? 1 : 2
+      } else {
+        index = n === 1 ? 0 : 1
+      }
+      return forms[index].replace('{n}', n)
+    }
+
+    function update() {
+      var checked = form.querySelector('input[name="pao"]:checked')
+      if (!opened.value || !checked) {
+        empty.hidden = false
+        answer.hidden = true
+        pitch.hidden = true
+        return
+      }
+
+      var months = Number(checked.value)
+      var end = addMonths(parseDay(opened.value), months)
+      var reason = phrase(phrases.byPao, months)
+
+      // Срок на упаковке — последний день указанного месяца. Если он раньше — побеждает он,
+      // ровно как в приложении: «более ранняя из двух дат»
+      if (expMonth.value !== '' && expYear.value !== '') {
+        var exp = new Date(Number(expYear.value), Number(expMonth.value) + 1, 0)
+        if (exp < end) {
+          end = exp
+          reason = phrases.byExp
+        }
+      }
+
+      var today = new Date()
+      today = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+      var days = daysBetween(today, end)
+
+      until.textContent = format.format(end)
+      left.textContent =
+        days > 0 ? phrase(phrases.left, days) : days === 0 ? phrases.today : phrase(phrases.expired, -days)
+      left.classList.toggle('bad', days <= 0)
+      why.textContent = reason
+
+      empty.hidden = true
+      answer.hidden = false
+      pitch.hidden = false
+
+      // Одно событие на загрузку: вопрос «сколько человек получили ответ», а не «сколько раз
+      // нажимали кнопки». Каждое переключение значка отдельным событием утопило бы это число
+      if (!reported) {
+        reported = true
+        window.ficus.hit('calculator_result', { pao: String(months) })
+      }
+    }
+
+    opened.value = toInputValue(new Date())
+    form.addEventListener('input', update)
+    form.addEventListener('change', update)
+    update()
+
+    // С телефона вторая кнопка лишняя: стор у человека один, и он в кармане. С компьютера
+    // остаются обе — с какого телефона будут ставить, отсюда не видно
+    var ua = navigator.userAgent
+    var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    var isAndroid = /Android/.test(ua)
+
+    document.querySelectorAll('[data-calc-store]').forEach(function (button) {
+      var store = button.dataset.calcStore
+      if ((isIOS && store === 'android') || (isAndroid && store === 'ios')) button.hidden = true
+
+      button.addEventListener('click', function () {
+        window.ficus.hit('store_open', { tag: 'calculator', via: 'none', store: store, mode: 'manual' })
+      })
+    })
+  })()
+</script>
+
+<style>
+  .app {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .app img {
+    border-radius: 7px;
+  }
+
+  h1 {
+    font-size: 28px;
+    line-height: 1.2;
+    margin: 20px 0 8px;
+  }
+
+  .lead {
+    color: var(--muted);
+    margin: 0 0 28px;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .field {
+    display: block;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .label {
+    display: block;
+    font-weight: 600;
+    padding: 0;
+    margin-bottom: 8px;
+  }
+
+  .optional {
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  input[type='date'],
+  select {
+    font: inherit;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    min-height: 46px;
+  }
+
+  input[type='date'] {
+    width: 100%;
+    max-width: 16rem;
+  }
+
+  .pao-row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .jar {
+    flex: none;
+    width: 56px;
+    height: 56px;
+    color: var(--accent-dark);
+  }
+
+  .hint {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 6px 0 0;
+  }
+
+  .pao-row .hint {
+    margin: 0;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .chip span {
+    display: inline-block;
+    min-width: 3.4rem;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .chip input:checked + span {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .chip input:focus-visible + span {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .exp {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .exp select {
+    flex: 1 1 8rem;
+  }
+
+  .result {
+    margin-top: 28px;
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+  }
+
+  .result p {
+    margin: 0;
+  }
+
+  .empty {
+    color: var(--muted);
+  }
+
+  .until-label {
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .until {
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 2px 0 6px !important;
+  }
+
+  .left {
+    font-weight: 600;
+    color: var(--accent-dark);
+  }
+
+  .left.bad {
+    color: #b3261e;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .left {
+      color: var(--accent);
+    }
+
+    .left.bad {
+      color: #f2b8b5;
+    }
+  }
+
+  .why {
+    color: var(--muted);
+    font-size: 15px;
+    margin-top: 4px !important;
+  }
+
+  .pitch {
+    margin-top: 16px;
+  }
+
+  .pitch p {
+    margin: 0 0 12px;
+  }
+
+  .stores {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .store {
+    display: block;
+    padding: 14px 18px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg);
+    color: var(--text);
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .store:hover {
+    border-color: var(--accent);
+  }
+
+  .guide {
+    margin-top: 36px;
+    border-top: 1px solid var(--line);
+    padding-top: 20px;
+  }
+
+  .guide summary {
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 15px;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+
+  th {
+    font-weight: 400;
+    padding-right: 12px;
+  }
+
+  td {
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .note {
+    color: var(--muted);
+  }
+</style>

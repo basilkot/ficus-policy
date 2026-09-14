@@ -1,0 +1,21 @@
+---
+import Page from '../../../layouts/Page.astro'
+import ExpiryCalculator from '../../../components/ExpiryCalculator.astro'
+import { appBySlug } from '../../../data/apps'
+
+const app = appBySlug('beauty')
+---
+
+<Page
+  lang="ru"
+  title="Калькулятор срока годности косметики — Beauty Stuff"
+  description="Когда выбрасывать косметику: укажите дату вскрытия и значок открытой баночки (PAO) — и узнайте точную дату, до которой средство годно."
+  preview="/beauty/preview.png"
+  alternate={[
+    { lang: 'en', href: '/beauty/calculator' },
+    { lang: 'ru', href: '/ru/beauty/calculator' },
+    { lang: 'x-default', href: '/beauty/calculator' },
+  ]}
+>
+  <ExpiryCalculator app={app} lang="ru" />
+</Page>

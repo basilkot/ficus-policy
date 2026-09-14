@@ -1,0 +1,21 @@
+---
+import Page from '../../layouts/Page.astro'
+import ExpiryCalculator from '../../components/ExpiryCalculator.astro'
+import { appBySlug } from '../../data/apps'
+
+const app = appBySlug('beauty')
+---
+
+<Page
+  lang="en"
+  title="Makeup expiration date calculator — Beauty Stuff"
+  description="When to throw out makeup and skincare: enter the date you opened it and the open jar symbol (PAO), and see the exact date it expires."
+  preview="/beauty/preview.png"
+  alternate={[
+    { lang: 'en', href: '/beauty/calculator' },
+    { lang: 'ru', href: '/ru/beauty/calculator' },
+    { lang: 'x-default', href: '/beauty/calculator' },
+  ]}
+>
+  <ExpiryCalculator app={app} lang="en" />
+</Page>

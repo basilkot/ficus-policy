@@ -24,14 +24,16 @@ const { app, lang } = Astro.props
 const copy = {
   en: {
     open: 'Opening the store…',
-    manual: 'Nothing happened? Pick your store:',
+    // Нейтрально, а не «ничего не произошло?»: кнопки видит в основном тот, кого и не должно
+    // было увести, — пришедший с компьютера, и для него вопрос звучал бы как сбой
+    manual: 'Pick your store:',
     scan: 'On a computer? Scan this with your phone.',
     appStore: 'Download on the App Store',
     play: 'Get it on Google Play',
   },
   ru: {
     open: 'Открываем магазин…',
-    manual: 'Ничего не произошло? Выберите магазин:',
+    manual: 'Выберите магазин:',
     scan: 'Смотрите с компьютера? Наведите телефон.',
     appStore: 'Загрузить в App Store',
     play: 'Доступно в Google Play',
@@ -137,6 +139,10 @@ const qrTarget = new URL(`/${app.slug}?from=qr`, Astro.site).toString()
     <QR value={qrTarget} />
     <p class="note">{copy.scan}</p>
   </div>
+
+  {/* Рассказ о приложении, если страница его передала. Внутри `main` и до скрипта кнопок:
+      его кнопки магазинов тоже должны получить метку прихода и событие нажатия */}
+  <slot />
 </main>
 
 <script is:inline>

@@ -25,6 +25,8 @@
 |---|---|
 | Адреса приложений в сторах, сборка ссылок с кампанией | [`src/data/apps.ts`](src/data/apps.ts) |
 | Страница перехода — то, куда ведёт короткий адрес | [`src/components/AppGate.astro`](src/components/AppGate.astro) |
+| Рассказ о приложении под переходом — для пришедших с компьютера | [`src/components/AppStory.astro`](src/components/AppStory.astro) |
+| Кадры рассказа — кадры витрины App Store, ужатые в webp | [`public/beauty/shots/en/`](public/beauty/shots/en/) |
 | QR, посчитанный на сборке | [`src/components/QR.astro`](src/components/QR.astro) |
 | Обвязка страницы и теги превью | [`src/layouts/Page.astro`](src/layouts/Page.astro) |
 | Картинка превью для ссылки, `og:image` | [`public/beauty/preview.png`](public/beauty/preview.png), собирается [`banner.py`](../beauty-stuff-ios/Tools/screenshots/banner.py) |
@@ -106,6 +108,19 @@ npm run build    # dist/
 
 Страница перехода с телефона уводит в стор мгновенно — посмотреть её саму можно
 по `?stay=1`.
+
+**Кадры рассказа не рисуются здесь, а берутся с витрины.** После пересборки кадров
+App Store (`beauty-stuff-ios/Tools/screenshots/`) их надо переложить сюда, иначе сайт
+и стор начнут обещать разное:
+
+```sh
+for f in ../beauty-stuff-ios/design/store/6.5/en/*.png; do
+  cwebp -quiet -q 82 -resize 600 0 "$f" -o public/beauty/shots/en/$(basename "$f" .png).webp
+done
+```
+
+Кадр `04` на странице не показывается — он про платное заведение по фото, см. комментарий
+в `AppStory.astro`.
 
 ## Публикация
 

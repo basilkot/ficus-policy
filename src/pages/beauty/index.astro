@@ -1,6 +1,7 @@
 ---
 import Page from '../../layouts/Page.astro'
 import AppGate from '../../components/AppGate.astro'
+import AppStory from '../../components/AppStory.astro'
 import { appBySlug } from '../../data/apps'
 
 const app = appBySlug('beauty')
@@ -8,8 +9,8 @@ const app = appBySlug('beauty')
 
 <Page
   lang="en"
-  title={`${app.name} — get the app`}
-  description={app.tagline.en}
+  title={`${app.name} — makeup expiration tracker`}
+  description="Keeps track of what is in your makeup bag and reminds you before it expires. Free on iPhone and Android."
   preview="/beauty/preview.png"
   alternate={[
     { lang: 'en', href: '/beauty' },
@@ -17,5 +18,7 @@ const app = appBySlug('beauty')
     { lang: 'x-default', href: '/beauty' },
   ]}
 >
-  <AppGate app={app} lang="en" />
+  <AppGate app={app} lang="en">
+    <AppStory app={app} lang="en" />
+  </AppGate>
 </Page>

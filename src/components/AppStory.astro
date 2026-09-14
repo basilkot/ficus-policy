@@ -1,0 +1,288 @@
+---
+import { appStoreURL, playStoreURL, type AppEntry } from '../data/apps'
+
+/**
+ * Рассказ о приложении — то, что видит пришедший на `/beauty` с компьютера или по `?stay=1`.
+ *
+ * **Живёт под страницей перехода, а не вместо неё.** С телефона сюда не доходит никто:
+ * переход уводит в стор до первой отрисовки, и это его работа, важнее любого рассказа.
+ * Рассказ нужен другим — открывшему пин или ссылку в переписке с компьютера: ему прислали
+ * адрес, и без объяснения, что это за приложение, QR ему сканировать незачем.
+ *
+ * Кадры — те же, что на витрине, ужатые в webp (как пересобрать — в README). Один источник
+ * у кадров, пинов и превью: человек, пришедший отсюда в стор, видит там то же обещание.
+ */
+interface Props {
+  app: AppEntry
+  lang: 'en' | 'ru'
+}
+
+const { app, lang } = Astro.props
+
+/**
+ * Кадр 04 («Snap a photo, we fill in the rest») пропущен намеренно: заведение по фото
+ * живёт во втором тарифе ([docs/paid-features.md]), а лента обещает без оговорок. Та же
+ * причина, по которой его нет среди пинов.
+ *
+ * Подписей на русском у витрины нет, поэтому русская страница показывает английские
+ * кадры — так же, как и картинка превью. `alt` при этом на языке страницы.
+ */
+const shots = [
+  { file: '01', en: 'Know what to toss and when', ru: 'Видно, что и когда выбросить' },
+  { file: '02', en: "We'll remind you before it goes bad", ru: 'Напомним, пока не испортилось' },
+  { file: '03', en: 'All your cosmetics in one place', ru: 'Вся косметика в одном месте' },
+  { file: '05', en: 'How long each one has left', ru: 'Сколько осталось каждому продукту' },
+  { file: '06', en: 'What you have and what it cost', ru: 'Что у вас есть и сколько это стоило' },
+  { file: '07', en: 'The shopping list writes itself', ru: 'Список покупок пишется сам' },
+  { file: '08', en: 'Your whole shelf in one picture', ru: 'Вся полка на одной картинке' },
+]
+
+const copy = {
+  en: {
+    howTitle: 'How it works',
+    steps: [
+      ['Add what you have', 'Name, brand and the day you opened it. A photo, if you like.'],
+      ['The app counts the days', 'From the date on the package and the period after opening — whichever comes first.'],
+      ['You hear about it in time', 'A day, a week or a month ahead. Everything running out gathers in “Needs attention”.'],
+    ],
+    plansTitle: 'What it costs',
+    freeTitle: 'Free, and it stays free',
+    free: 'Expiry dates and reminders, product photos, the home screen widget, statistics and Year in review, the shelf and collages, the shopping list, backups. All of it works offline.',
+    paidTitle: 'A subscription, if you want more',
+    paid: 'The date read straight off the package, skincare routines, collage templates and sync between your devices. With AI on top: a product added from a photo, ingredients read from the label, advice on your own collection.',
+    terms: 'A week free on any plan, then from $3.99 a month. No ads, and there won’t be any.',
+    closing: 'Get Beauty Stuff',
+    appStore: 'Download on the App Store',
+    play: 'Get it on Google Play',
+    contact: 'Questions or ideas? Write to',
+  },
+  ru: {
+    howTitle: 'Как это работает',
+    steps: [
+      ['Занесите, что у вас есть', 'Название, бренд и день, когда открыли. Фотографию — по желанию.'],
+      ['Приложение считает дни', 'По дате на упаковке и сроку после вскрытия — берёт ту, что наступит раньше.'],
+      ['Вы узнаёте вовремя', 'За день, неделю или месяц. Всё, у чего срок на исходе, собирается в «Требуют внимания».'],
+    ],
+    plansTitle: 'Сколько стоит',
+    freeTitle: 'Бесплатно — и останется бесплатным',
+    free: 'Сроки годности и напоминания, фотографии продуктов, виджет на домашнем экране, статистика и «Итог года», полка и коллажи, список покупок, резервные копии. Всё это работает без сети.',
+    paidTitle: 'Подписка — если хочется большего',
+    paid: 'Срок, прочитанный прямо с упаковки, рутины ухода, шаблоны коллажей и синхронизация между устройствами. С ИИ сверху: продукт по фотографии упаковки, состав по фотографии этикетки, советы по вашей косметичке.',
+    terms: 'Неделя бесплатно на любом плане, дальше от 3,99 $ в месяц. Рекламы нет и не будет.',
+    closing: 'Установить Beauty Stuff',
+    appStore: 'Загрузить в App Store',
+    play: 'Доступно в Google Play',
+    contact: 'Вопросы и идеи — пишите на',
+  },
+}[lang]
+
+const contactEmail = 'kot.julic@gmail.com'
+
+// Метка сайта — как и у кнопок перехода: скрипт страницы перехода подменит её на метку
+// прихода, потому что ищет кнопки по `data-store`, а не по месту на странице
+const links = { ios: appStoreURL(app, 'site'), android: playStoreURL(app, 'site') }
+---
+
+<section class="gallery" aria-label={app.name}>
+  <div class="strip">
+    {
+      shots.map((shot) => (
+        <img
+          src={`/${app.slug}/shots/en/${shot.file}.webp`}
+          alt={shot[lang]}
+          width="600"
+          height="1299"
+          loading="lazy"
+          decoding="async"
+        />
+      ))
+    }
+  </div>
+</section>
+
+<section class="story">
+  <h2>{copy.howTitle}</h2>
+  <ol class="steps">
+    {
+      copy.steps.map(([title, text]) => (
+        <li>
+          <strong>{title}</strong>
+          <span>{text}</span>
+        </li>
+      ))
+    }
+  </ol>
+
+  <h2>{copy.plansTitle}</h2>
+  <div class="plan">
+    <h3>{copy.freeTitle}</h3>
+    <p>{copy.free}</p>
+  </div>
+  <div class="plan">
+    <h3>{copy.paidTitle}</h3>
+    <p>{copy.paid}</p>
+  </div>
+  <p class="terms">{copy.terms}</p>
+</section>
+
+<section class="closing">
+  <h2>{copy.closing}</h2>
+  <div class="stores">
+    <a class="store" href={links.ios} data-store="ios">{copy.appStore}</a>
+    <a class="store" href={links.android} data-store="android">{copy.play}</a>
+  </div>
+</section>
+
+{/* Адресом, а не формой: пока писем нет, форма стоит времени и ничего не даёт. Первые
+    письма — единственная содержательная обратная связь запуска ([docs/marketing/05-landing.md]) */}
+<footer class="contact">
+  {copy.contact} <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
+</footer>
+
+<style>
+  /* Лента шире колонки текста: семь кадров в колонке в 34rem — это полтора кадра на экране.
+     Выход на всю ширину окна считается от `100vw`, а в нём сидит полоса прокрутки, —
+     отсюда `clip` на `body`: иначе у страницы появится горизонтальный сдвиг в её ширину */
+  :global(body) {
+    overflow-x: clip;
+  }
+
+  .gallery {
+    width: 100vw;
+    margin: 56px calc(50% - 50vw) 0;
+    padding-top: 40px;
+    border-top: 1px solid var(--line);
+  }
+
+  .strip {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 0 max(20px, calc(50vw - 34rem)) 12px;
+  }
+
+  /* Когда кадры помещаются целиком, лента встаёт по центру, а не прижимается влево */
+  @media (min-width: 1400px) {
+    .strip {
+      justify-content: center;
+    }
+  }
+
+  .strip img {
+    flex: none;
+    width: 180px;
+    height: auto;
+    border-radius: 14px;
+    scroll-snap-align: center;
+    background: var(--surface);
+  }
+
+  .story,
+  .closing {
+    text-align: left;
+  }
+
+  h2 {
+    font-size: 22px;
+    margin: 48px 0 16px;
+  }
+
+  .steps {
+    list-style: none;
+    counter-reset: step;
+    padding: 0;
+    margin: 0;
+  }
+
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 44px;
+    margin-bottom: 18px;
+  }
+
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 1px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--accent-dark);
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 28px;
+    text-align: center;
+  }
+
+  .steps strong,
+  .steps span {
+    display: block;
+  }
+
+  .steps span,
+  .plan p {
+    color: var(--muted);
+  }
+
+  .plan {
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    margin-bottom: 12px;
+  }
+
+  .plan h3 {
+    font-size: 17px;
+    margin: 0 0 4px;
+  }
+
+  .plan p {
+    margin: 0;
+    font-size: 15px;
+  }
+
+  .terms {
+    font-size: 15px;
+    margin: 16px 0 0;
+  }
+
+  .closing {
+    margin-top: 12px;
+  }
+
+  .stores {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .store {
+    display: block;
+    padding: 14px 18px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text);
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .store:hover {
+    border-color: var(--accent);
+  }
+
+  .contact {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 14px;
+  }
+</style>

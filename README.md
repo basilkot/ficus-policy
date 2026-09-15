@@ -29,6 +29,7 @@
 | Кадры рассказа — кадры витрины App Store, ужатые в webp | [`public/beauty/shots/en/`](public/beauty/shots/en/) |
 | Калькулятор срока годности, `/beauty/calculator` — считает как приложение | [`src/components/ExpiryCalculator.astro`](src/components/ExpiryCalculator.astro) |
 | QR, посчитанный на сборке | [`src/components/QR.astro`](src/components/QR.astro) |
+| Карта сайта — собирается из `src/pages`, без `/legal` | [`src/pages/sitemap.xml.ts`](src/pages/sitemap.xml.ts), ссылка в [`public/robots.txt`](public/robots.txt) |
 | Обвязка страницы и теги превью | [`src/layouts/Page.astro`](src/layouts/Page.astro) |
 | Картинка превью для ссылки, `og:image` | [`public/beauty/preview.png`](public/beauty/preview.png), собирается [`banner.py`](../beauty-stuff-ios/Tools/screenshots/banner.py) |
 | Счётчик и события, которые он шлёт | [`src/components/Analytics.astro`](src/components/Analytics.astro), [`src/data/analytics.ts`](src/data/analytics.ts) |

@@ -12,7 +12,8 @@ import type { APIRoute } from 'astro'
  * а поисковику сайт должен сообщать, что он про приложения, — см. `pages/index.astro`.
  * Политики вдобавок лежат в `public/` и страницами Astro не являются.
  */
-const excluded = ['/legal/']
+// `/beauty/paid/` — страница возврата после оплаты, искать её незачем
+const excluded = ['/legal/', '/beauty/paid/']
 
 const paths = Object.keys(import.meta.glob('./**/*.astro'))
   .map((file) => file.replace(/^\./, '').replace(/(index)?\.astro$/, '').replace(/([^/])$/, '$1/'))

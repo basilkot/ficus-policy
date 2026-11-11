@@ -44,6 +44,11 @@ export const documents: DocumentEntry[] = [
     note: 'По-русски',
   },
   {
+    href: '/beauty-stuff/offer/',
+    title: 'Beauty Stuff для Android — публичная оферта',
+    note: 'Оплата доступа рублями через ЮKassa, для пользователей из России',
+  },
+  {
     href: '/beauty-stuff/delete/',
     title: 'Beauty Stuff for Android — Deleting your account and data',
     note: 'The address Play shows on the store listing',

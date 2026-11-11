@@ -1,0 +1,42 @@
+---
+import Page from '../../../layouts/Page.astro'
+
+// Сюда ЮKassa возвращает человека после оплаты рублями (`RETURN_URL` в
+// beauty-stuff/functions/yookassa.js). Задача одна — вернуть в приложение: доступ там
+// открывается сам, как только до сервера дойдёт уведомление об оплате.
+//
+// Только по-русски: оплата рублями существует только для пользователей из России.
+// Ссылка `intent://` открывает приложение в Chrome на Android; в другом браузере она
+// не сработает, и для этого случая написано, что приложение можно открыть самому.
+const intent = 'intent://#Intent;package=ru.basilkot.beautystuff;end'
+---
+
+<Page lang="ru" title="Оплата прошла — Beauty Stuff" description="Вернитесь в приложение: доступ откроется сам.">
+  <main>
+    <h1>Спасибо!</h1>
+    <p class="lead">
+      Если оплата прошла, доступ откроется в приложении сам — обычно в течение минуты.
+    </p>
+    <p><a class="button" href={intent}>Вернуться в Beauty Stuff</a></p>
+    <p class="note">
+      Кнопка не сработала — просто откройте приложение. Доступ не появился в течение часа —
+      напишите на <a href="mailto:kot.julic@gmail.com">kot.julic@gmail.com</a>, указав адрес
+      аккаунта Google и дату оплаты.
+    </p>
+  </main>
+</Page>
+
+<style>
+  h1 { font-size: 28px; margin: 0 0 8px; }
+  .lead { font-size: 17px; margin: 0 0 24px; }
+  .button {
+    display: inline-block;
+    padding: 12px 20px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--bg);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .note { color: var(--muted); font-size: 15px; margin-top: 24px; }
+</style>

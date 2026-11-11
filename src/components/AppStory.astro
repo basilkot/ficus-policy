@@ -145,6 +145,9 @@ const links = { ios: appStoreURL(app, 'site'), android: playStoreURL(app, 'site'
     письма — единственная содержательная обратная связь запуска ([docs/marketing/05-landing.md]) */}
 <footer class="contact">
   {copy.contact} <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
+  {/* Оплата рублями есть только у русской версии, и ЮKassa проверяет, что оферта, цены
+      и реквизиты самозанятого находятся с сайта, а не только по прямой ссылке */}
+  {lang === 'ru' && <p><a href="/beauty-stuff/offer/">Оплата из России: оферта, цены и реквизиты</a></p>}
 </footer>
 
 <style>

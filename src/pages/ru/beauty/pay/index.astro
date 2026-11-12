@@ -1,0 +1,214 @@
+---
+import Page from '../../../../layouts/Page.astro'
+import { firebaseConfig } from '../../../../data/firebase'
+
+// Оплата Beauty Stuff рублями — для тех, кому в приложении её показать нельзя: на iPhone
+// правила App Store запрещают даже упоминать оплату вне App Store. Человек находит
+// страницу сам, платит здесь, а приложение признаёт оплаченное по аккаунту Google.
+//
+// Цены — те же, что `PLANS` в beauty-stuff/functions/yookassa.js и оферта: списывает
+// сервер по своей таблице, здесь только подпись.
+//
+// Firebase — модулями с gstatic прямо в браузере: сайт статический, и тянуть SDK в сборку
+// ради одной страницы незачем. Версия закреплена.
+const plans = [
+  {
+    tier: 'base',
+    title: 'Всё приложение',
+    lines: [
+      'Срок годности и значок «12M» — по фотографии упаковки',
+      'Рутины ухода и предупреждения о сочетаниях',
+      'Шаблоны коллажей',
+      'Синхронизация между устройствами',
+    ],
+    buttons: [
+      { plan: 'year', label: 'Год — 990 ₽' },
+      { plan: 'month', label: 'Месяц — 199 ₽' },
+    ],
+  },
+  {
+    tier: 'ai',
+    title: 'Всё это — и ИИ',
+    lines: [
+      'Продукт заводится по фотографии упаковки',
+      'Состав читается с этикетки — с ролями и аллергенами',
+      'Советы по косметичке',
+      '50 обращений к ИИ в месяц, из них до 8 советов',
+    ],
+    buttons: [
+      { plan: 'ai_year', label: 'Год — 1790 ₽' },
+      { plan: 'ai_month', label: 'Месяц — 349 ₽' },
+    ],
+  },
+]
+---
+
+<Page
+  lang="ru"
+  title="Оплата Beauty Stuff из России"
+  description="Оплатить платные возможности Beauty Stuff рублями — картой или через СБП. Разовый платёж, без автопродления."
+  preview="/beauty/preview.png"
+>
+  <main data-config={JSON.stringify(firebaseConfig)}>
+    <p class="back"><a href="/ru/beauty/">Beauty Stuff</a></p>
+
+    <h1>Оплата из России</h1>
+    <p class="lead">
+      Платные возможности Beauty Stuff можно оплатить здесь рублями — картой или через СБП.
+      Разовый платёж на год или месяц, без автопродления.
+    </p>
+
+    <p class="banner" id="paid" hidden>
+      Спасибо! Если оплата прошла, срок появится ниже в течение минуты. Как открыть доступ
+      в приложении — в конце страницы.
+    </p>
+    <p class="banner warn" id="off" hidden>Оплата временно недоступна — попробуйте позже.</p>
+
+    <section class="step">
+      <h2>1. Войдите через Google</h2>
+      <p class="muted">Оплаченный доступ привязывается к этому аккаунту.</p>
+      <button class="primary" id="signin" type="button">Войти через Google</button>
+      <p id="who" hidden><span id="email"></span> · <button class="link" id="signout" type="button">Выйти</button></p>
+    </section>
+
+    <section class="step">
+      <h2>2. Выберите тариф</h2>
+      {
+        plans.map((p) => (
+          <div class="card" data-tier={p.tier}>
+            <h3>{p.title}</h3>
+            <ul>{p.lines.map((l) => <li>{l}</li>)}</ul>
+            <p class="until" hidden />
+            <div class="buttons">
+              {p.buttons.map((b) => (
+                <button class="primary" type="button" data-plan={b.plan} disabled>
+                  {b.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+      <p class="muted small">
+        Если срок уже оплачен, новый прибавится к оставшемуся. Нажимая кнопку оплаты, вы принимаете
+        <a href="/beauty-stuff/offer/">оферту</a>. Оплату принимает ЮKassa.
+      </p>
+      <p class="error" id="error" hidden></p>
+    </section>
+
+    <section class="step">
+      <h2>3. Откройте доступ в приложении</h2>
+      <p><strong>Android.</strong> Настройки → «Синхронизировать косметичку» → «Войти через Google» —
+        тем же аккаунтом. Или на экране подписки нажмите «Восстановить покупки».</p>
+      <p><strong>iPhone.</strong> Настройки → «Синхронизация» → войдите через Apple, затем нажмите
+        «Привязать аккаунт Google» и выберите тот же аккаунт.</p>
+      <p class="muted small">Не получилось — напишите на <a href="mailto:kot.julic@gmail.com">kot.julic@gmail.com</a>,
+        указав адрес аккаунта Google.</p>
+    </section>
+  </main>
+</Page>
+
+<script is:inline type="module">
+  const SDK = 'https://www.gstatic.com/firebasejs/11.0.2'
+  const $ = (id) => document.getElementById(id)
+  const config = JSON.parse(document.querySelector('main').dataset.config)
+  const buttons = [...document.querySelectorAll('button[data-plan]')]
+  const showError = (text) => { $('error').textContent = text; $('error').hidden = !text }
+
+  if (new URLSearchParams(location.search).has('paid')) $('paid').hidden = false
+
+  if (!config.apiKey) {
+    $('off').hidden = false
+    $('signin').disabled = true
+  } else {
+    const { initializeApp } = await import(`${SDK}/firebase-app.js`)
+    const { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } = await import(`${SDK}/firebase-auth.js`)
+    const { getFunctions, httpsCallable } = await import(`${SDK}/firebase-functions.js`)
+    const { getFirestore, doc, getDoc, onSnapshot } = await import(`${SDK}/firebase-firestore.js`)
+
+    const app = initializeApp(config)
+    const auth = getAuth(app)
+    const db = getFirestore(app)
+    const checkout = httpsCallable(getFunctions(app, 'us-central1'), 'checkoutRuWeb')
+
+    // Выключатель продаж — тот же, что у приложения (config/rupay.enabled)
+    let enabled = true
+    try { enabled = (await getDoc(doc(db, 'config', 'rupay'))).data()?.enabled !== false } catch {}
+    if (!enabled) $('off').hidden = false
+
+    const date = (ts) => ts?.toDate().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+    let stop = null
+
+    onAuthStateChanged(auth, (user) => {
+      $('signin').hidden = !!user
+      $('who').hidden = !user
+      $('email').textContent = user?.email ?? ''
+      buttons.forEach((b) => { b.disabled = !user || !enabled })
+      stop?.()
+      document.querySelectorAll('.until').forEach((u) => { u.hidden = true })
+      if (!user) return
+      // Сроки — живьём: после оплаты уведомление ЮKassa доходит до сервера за секунды
+      stop = onSnapshot(doc(db, 'users', user.uid, 'private', 'prepaid'), (snap) => {
+        const data = snap.data() ?? {}
+        const now = Date.now()
+        for (const [tier, field] of [['base', 'until'], ['ai', 'aiUntil']]) {
+          const el = document.querySelector(`.card[data-tier="${tier}"] .until`)
+          const ts = data[field]
+          el.hidden = !(ts && ts.toMillis() > now)
+          if (!el.hidden) el.textContent = `Оплачено до ${date(ts)}`
+        }
+      }, () => {})
+    })
+
+    $('signin').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch((e) => {
+      if (e.code !== 'auth/popup-closed-by-user') showError('Войти не удалось. Попробуйте ещё раз.')
+    })
+    $('signout').onclick = () => signOut(auth)
+
+    buttons.forEach((b) => {
+      b.onclick = async () => {
+        showError('')
+        buttons.forEach((x) => { x.disabled = true })
+        try {
+          const { data } = await checkout({ plan: b.dataset.plan })
+          location.href = data.url
+        } catch (e) {
+          showError(e.code === 'functions/failed-precondition'
+            ? 'Оплата временно недоступна — попробуйте позже.'
+            : 'Не удалось открыть оплату. Попробуйте ещё раз.')
+          buttons.forEach((x) => { x.disabled = false })
+        }
+      }
+    })
+  }
+</script>
+
+<style>
+  .back { margin: 0 0 28px; font-size: 15px; }
+  h1 { font-size: 28px; margin: 0 0 8px; }
+  h2 { font-size: 19px; margin: 0 0 6px; }
+  h3 { font-size: 17px; margin: 0 0 8px; }
+  .lead { margin: 0 0 24px; }
+  .step { margin: 0 0 36px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 15px; }
+  .banner { background: var(--surface); border-left: 4px solid var(--accent); padding: 12px 14px; border-radius: 6px; }
+  .banner.warn { border-left-color: #c0392b; }
+  .card { border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin: 12px 0; }
+  .card ul { margin: 0 0 12px; padding-left: 20px; }
+  .card li { margin: 4px 0; }
+  .until { color: var(--accent-dark); font-weight: 600; margin: 0 0 10px; }
+  .buttons { display: grid; gap: 8px; }
+  button.primary {
+    font: inherit; font-weight: 600; border: 0; border-radius: 999px; padding: 12px 18px;
+    background: var(--accent); color: var(--bg); cursor: pointer; width: 100%;
+  }
+  button.primary:disabled { opacity: 0.45; cursor: default; }
+  #signin { width: auto; }
+  button.link { font: inherit; background: none; border: 0; color: var(--accent-dark); text-decoration: underline; cursor: pointer; padding: 0; }
+  .error { color: #c0392b; }
+  @media (prefers-color-scheme: dark) {
+    .until { color: var(--accent); }
+    button.link { color: var(--accent); }
+  }
+</style>
